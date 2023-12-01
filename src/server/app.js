@@ -9,6 +9,45 @@ app.use(express.json());
 app.use(cors());
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
 
+async function createFile() {
+  try {
+    const file = await openai.files.create({
+      file: fs.createReadStream("xamatriain.pdf"),
+      purpose: "assistants",
+    });
+    return file;
+  } catch (error) {
+    console.error("Error creating file:", error);
+    // Handle error appropriately
+  }
+}
+
+const openai = axios.create({
+  baseURL: 'https://api.openai.com',
+  headers: {
+    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+app.post('/create-assistant', async (req, res) => {
+  try {
+    const assistantData = {
+      name: "Xavibot",
+      description: "You are a chatbot that responds like Xavier Amatriain. You not only know about him and his experience, but you also try to answer as if you were him.",
+      model: "gpt-4-1106-preview",
+      tools: [{"type": "retrieval "}],
+      file_ids: [file.id]
+    };
+
+    const response = await openai.post('/v1/assistants', assistantData);
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error creating assistant:", error.response ? error.response.data : error);
+    res.status(500).json({ message: "Failed to create assistant" });
+  }
+});
+
 app.post('/chat', async (req, res) => {
   const userMessage = req.body.message;
 
