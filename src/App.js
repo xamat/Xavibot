@@ -10,7 +10,60 @@ import config from './config.js';
 import MessageParser from './MessageParser.js';
 import ActionProvider from './ActionProvider.js';
 
-function App() {
+function ChatbotContainer() {
+  console.log("ChatbotContainer is called");
+
+  const [assistantCreated, setAssistantCreated] = useState(false);
+  const [threadId, setThreadId] = useState(null);
+
+  
+  useEffect(() => {
+    const initializeChatbot = async () => {
+      if (!assistantCreated) {
+        try {
+          // Make a POST request to create the assistant
+          console.log("Creating assistant from use effect");
+          await axios.post('http://localhost:3001/create-assistant', {
+            // Your assistant data here
+          });
+          console.log("Assistant created");
+          setAssistantCreated(true);
+        } catch (error) {
+          console.error('Error creating assistant:', error);
+        }
+      }
+
+      if (assistantCreated && !threadId) {
+        try {
+          const threadResponse = await axios.post('http://localhost:3001/create-thread');
+          setThreadId(threadResponse.data); // Update based on your actual response structure
+          console.log("Assistant and thread created");
+          console.log(threadResponse.data);
+        } catch (error) {
+          console.error('Error creating thread:', error);
+        }
+      }
+    };
+
+    initializeChatbot();
+  }, [assistantCreated, threadId]);
+
+  return (
+    <div>
+      {/* Render the Chatbot only if the assistant and thread are created */}
+      {assistantCreated && threadId && (
+        <Chatbot 
+          config={config} 
+          actionProvider={ActionProvider} 
+          messageParser={MessageParser}
+        />
+      )}
+    </div>
+  );
+}
+
+
+ /* function App() {
   return (
     <div className="App">
       <header className="App-header">
@@ -22,41 +75,22 @@ function App() {
       </header>
     </div>
   );
-}
+} */
+ 
 
-function ChatbotContainer() {
-  const [assistantCreated, setAssistantCreated] = useState(false);
-
-  useEffect(() => {
-    const createAssistant = async () => {
-      try {
-        // Make a POST request to create the assistant
-        await axios.post('http://localhost:3000/create-assistant', {
-          // Your assistant data here
-        });
-        setAssistantCreated(true);
-      } catch (error) {
-        console.error('Error creating assistant:', error);
-      }
-    };
-
-    if (!assistantCreated) {
-      createAssistant();
-    }
-  }, [assistantCreated]);
+function App() {
+  console.log("APP is called");
 
   return (
-    <div>
-      {/* Render the Chatbot only if the assistant is created */}
-      {assistantCreated && (
-        <Chatbot 
-          config={config} 
-          actionProvider={ActionProvider} 
-          messageParser={MessageParser}
-        />
-      )}
+    <div className="App">
+      <header className="App-header">
+        <ChatbotContainer 
+        config={config} 
+        actionProvider={ActionProvider} 
+        messageParser={MessageParser}/>
+      </header>
     </div>
-  );
+  ); 
 }
 
 export default App;

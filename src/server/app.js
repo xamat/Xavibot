@@ -3,11 +3,23 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const app = express();
+const { OpenAI } = require('openai');
 
 app.use(express.json());
 // Enable CORS for all routes
 app.use(cors());
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
+
+//const openai = OpenAI.Beta.Assistants.create({
+//const openai = axios.create({
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: 'https://api.openai.com/v1',
+  defaultHeaders: {
+    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+});
 
 async function createFile() {
   try {
@@ -22,29 +34,41 @@ async function createFile() {
   }
 }
 
-const openai = axios.create({
-  baseURL: 'https://api.openai.com',
-  headers: {
-    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-    'Content-Type': 'application/json'
+app.post('/create-assistant', async (req,res) => {
+  console.log("Creating assistant in the backend")
+  //createFile();
+  try {
+    
+    const assistant = await openai.beta.assistants.create({
+      name: "Xavibot",
+      instructions: "You are great at creating beautiful data visualizations. You analyze data present in .csv files, understand trends, and come up with data visualizations relevant to those trends. You also share a brief text summary of the trends observed.",
+      model: "gpt-4-1106-preview",
+      tools: [{"type": "retrieval"}],
+      //file_ids: [file.id]
+    });
+    res.json({ message: "Assistant created" })
+    
+   } 
+ catch (error) {
+    console.error("Error creating assistant:", error.response ? error.response.data : error);
+    //res.status(500).json({ message: "Failed to create assistant" });
   }
+  console.log("Assistant created in the backend")
 });
 
-app.post('/create-assistant', async (req, res) => {
+app.post('/create-thread', async (req, res) => {
+  console.log("Creating thread")
   try {
-    const assistantData = {
-      name: "Xavibot",
-      description: "You are a chatbot that responds like Xavier Amatriain. You not only know about him and his experience, but you also try to answer as if you were him.",
-      model: "gpt-4-1106-preview",
-      tools: [{"type": "retrieval "}],
-      file_ids: [file.id]
-    };
-
-    const response = await openai.post('/v1/assistants', assistantData);
-    res.json(response.data);
+    const thread = await openai.beta.threads.create({
+      // Additional parameters if needed
+    });
+    //thread.data.id = thread.id;
+    //res.json(thread.data);
+    res.json(thread.id);
+    console.log(thread.id);
   } catch (error) {
-    console.error("Error creating assistant:", error.response ? error.response.data : error);
-    res.status(500).json({ message: "Failed to create assistant" });
+    console.error("Error creating thread:", error.response ? error.response.data : error);
+    res.status(500).json({ message: "Failed to create thread" });
   }
 });
 
