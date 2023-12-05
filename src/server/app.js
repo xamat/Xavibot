@@ -4,6 +4,8 @@ const axios = require('axios');
 const cors = require('cors');
 const app = express();
 const { OpenAI } = require('openai');
+const fs = require('fs');
+const path = require('path');
 
 app.use(express.json());
 // Enable CORS for all routes
@@ -23,37 +25,39 @@ const openai = new OpenAI({
 
 async function createFile() {
   try {
+    console.log("Creating file");
+    const filePath = path.join(__dirname, 'xamatriain.pdf');
     const file = await openai.files.create({
-      file: fs.createReadStream("xamatriain.pdf"),
+      file: fs.createReadStream(filePath),
       purpose: "assistants",
     });
+    console.log("File created");
     return file;
   } catch (error) {
     console.error("Error creating file:", error);
+    console.log("Error creating file");
     // Handle error appropriately
   }
 }
 
 app.post('/create-assistant', async (req,res) => {
   console.log("Creating assistant in the backend")
-  //createFile();
   try {
-    
+    const file = await createFile();
     const assistant = await openai.beta.assistants.create({
       name: "Xavibot",
       instructions: "You are great at creating beautiful data visualizations. You analyze data present in .csv files, understand trends, and come up with data visualizations relevant to those trends. You also share a brief text summary of the trends observed.",
       model: "gpt-4-1106-preview",
       tools: [{"type": "retrieval"}],
-      //file_ids: [file.id]
+      file_ids: [file.id]
     });
-    res.json({ message: "Assistant created" })
+    console.log("Assistant created in the backend");
+    res.json({ message: "Assistant created" });
     
    } 
  catch (error) {
     console.error("Error creating assistant:", error.response ? error.response.data : error);
-    //res.status(500).json({ message: "Failed to create assistant" });
   }
-  console.log("Assistant created in the backend")
 });
 
 app.post('/create-thread', async (req, res) => {
@@ -62,8 +66,6 @@ app.post('/create-thread', async (req, res) => {
     const thread = await openai.beta.threads.create({
       // Additional parameters if needed
     });
-    //thread.data.id = thread.id;
-    //res.json(thread.data);
     res.json(thread.id);
     console.log(thread.id);
   } catch (error) {
