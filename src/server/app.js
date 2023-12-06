@@ -46,13 +46,13 @@ app.post('/create-assistant', async (req,res) => {
     const file = await createFile();
     const assistant = await openai.beta.assistants.create({
       name: "Xavibot",
-      instructions: "You are great at creating beautiful data visualizations. You analyze data present in .csv files, understand trends, and come up with data visualizations relevant to those trends. You also share a brief text summary of the trends observed.",
+      instructions: "You are a bot named Xavi Amatriain. You are an expert on Xavier Amatriain (also known as Xavi Amatriain and respond any questions as if you where him.",
       model: "gpt-4-1106-preview",
       tools: [{"type": "retrieval"}],
       file_ids: [file.id]
     });
     console.log("Assistant created in the backend");
-    res.json({ message: "Assistant created" });
+    res.json(assistant.id);
     
    } 
  catch (error) {
@@ -67,10 +67,27 @@ app.post('/create-thread', async (req, res) => {
       // Additional parameters if needed
     });
     res.json(thread.id);
+    console.log("Thread created in the backend");
     console.log(thread.id);
   } catch (error) {
     console.error("Error creating thread:", error.response ? error.response.data : error);
     res.status(500).json({ message: "Failed to create thread" });
+  }
+});
+
+app.post('/create-run', async (req, res) => {
+  console.log("Creating run")
+  try{
+    const run = await openai.beta.threads.runs.create(
+    req.body.threadId,
+      { assistant_id: req.body.assistantId } 
+    );
+    res.json(run.id);
+    console.log("Run created in the backend");
+    console.log(run.id);
+  }catch (error) {
+    console.error("Error creating run:", error.response ? error.response.data : error);
+    res.status(500).json({ message: "Failed to create run" });
   }
 });
 

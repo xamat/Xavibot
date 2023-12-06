@@ -14,8 +14,9 @@ function ChatbotContainer() {
   console.log("ChatbotContainer is called");
 
   const [assistantCreated, setAssistantCreated] = useState(false);
+  const [assistantId, setAssistantId] = useState(null);
   const [threadId, setThreadId] = useState(null);
-
+  const [runId, setRunId] = useState(null);
   
   useEffect(() => {
     const initializeChatbot = async () => {
@@ -23,11 +24,12 @@ function ChatbotContainer() {
         try {
           // Make a POST request to create the assistant
           console.log("Creating assistant from use effect");
-          await axios.post('http://localhost:3001/create-assistant', {
+          const assistantResponse = await axios.post('http://localhost:3001/create-assistant', {
             // Your assistant data here
           });
           console.log("Assistant created");
           setAssistantCreated(true);
+          setAssistantId(assistantResponse.data);
         } catch (error) {
           console.error('Error creating assistant:', error);
         }
@@ -36,22 +38,33 @@ function ChatbotContainer() {
       if (assistantCreated && !threadId) {
         try {
           const threadResponse = await axios.post('http://localhost:3001/create-thread');
-          setThreadId(threadResponse.data); // Update based on your actual response structure
+          setThreadId(threadResponse.data); 
           console.log("Assistant and thread created");
           console.log(threadResponse.data);
         } catch (error) {
           console.error('Error creating thread:', error);
         }
       }
+      if (assistantCreated && threadId && !runId) {
+        try {
+          console.log("Creating run from the frontend");
+          const runResponse = await axios.post('http://localhost:3001/create-run', { threadId: threadId, assistantId: assistantId  });
+          setRunId(runResponse.data); 
+          console.log("Assistant, thread, and run created");
+          console.log(runResponse.data);
+        } catch (error) {
+          console.error('Error creating run:', error);
+        }
+      }
     };
 
     initializeChatbot();
-  }, [assistantCreated, threadId]);
+  }, [assistantCreated, threadId, runId]);
 
   return (
     <div>
       {/* Render the Chatbot only if the assistant and thread are created */}
-      {assistantCreated && threadId && (
+      {assistantCreated && threadId && runId &&(
         <Chatbot 
           config={config} 
           actionProvider={ActionProvider} 
