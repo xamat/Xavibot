@@ -3,10 +3,12 @@ import axios from 'axios';
 
 class ActionProvider {
     constructor(createChatBotMessage, setStateFunc, createClientMessage) {
+      console.log('Constructing Action Provider');
       this.createChatBotMessage = createChatBotMessage;
       this.setState = setStateFunc;
       this.createClientMessage = createClientMessage;
       this.sendMessageToBackend = this.sendMessageToBackend.bind(this);
+      this.sendMessageToAssistantBackend = this.sendMessageToAssistantBackend.bind(this);
     }
   
     greet() {
@@ -40,6 +42,25 @@ class ActionProvider {
           this.addMessageToChat("Caught Exception: Error sending message to backend");
         }
       }
+
+      async sendMessageToAssistantBackend(userMessage, threadId) {
+        console.log('Sending Message to Assistant Backend with threaId',threadId);
+        try {
+          const response = await axios.post('http://localhost:3001/chatWithAssistant', { message: userMessage, threadId: threadId });
+          const botMessage = response.data.message;
+          
+          // Method to add the bot's response to the chat
+          this.addMessageToChat(botMessage);
+        } catch (error) {
+          console.error('Error sending message to backend:', error);
+          console.log('Error');
+          //this.handleUnknown();
+          // Handle the error (e.g., by displaying an error message in the chat)
+          
+          this.addMessageToChat("Caught Exception: Error sending message to backend");
+        }
+      }
+    
     
       addMessageToChat(message) {
         const chatMessage = this.createChatBotMessage(message);
