@@ -43,10 +43,10 @@ class ActionProvider {
         }
       }
 
-      async sendMessageToAssistantBackend(userMessage, threadId) {
-        console.log('Sending Message to Assistant Backend with threaId',threadId);
+      async sendMessageToAssistantBackend(userMessage, threadId, assistantId) {
+        console.log('Sending Message to Assistant Backend with threaId, assistantId:',threadId, assistantId);
         try {
-          const response = await axios.post('http://localhost:3001/chatWithAssistant', { message: userMessage, threadId: threadId });
+          const response = await axios.post('http://localhost:3001/chatWithAssistant', { message: userMessage, threadId: threadId, assistantId: assistantId });
           const botMessage = response.data.message;
           
           // Method to add the bot's response to the chat

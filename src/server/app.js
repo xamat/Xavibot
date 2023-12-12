@@ -12,6 +12,10 @@ app.use(express.json());
 app.use(cors());
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
 
+// Global variable to store assistantId
+let globalAssistantId = null;
+
+
 //const openai = OpenAI.Beta.Assistants.create({
 //const openai = axios.create({
 const openai = new OpenAI({
@@ -41,7 +45,11 @@ async function createFile() {
 }
 
 app.post('/create-assistant', async (req,res) => {
-  console.log("Creating assistant in the backend")
+  if(globalAssistantId!=null){
+    console.log("Assistant has already been created in the backend with id:", globalAssistantId);
+    return;
+  }
+  console.log("Creating assistant in the backend. Current id:", globalAssistantId);
   try {
     const file = await createFile();
     const assistant = await openai.beta.assistants.create({
@@ -51,8 +59,9 @@ app.post('/create-assistant', async (req,res) => {
       tools: [{"type": "retrieval"}],
       file_ids: [file.id]
     });
-    console.log("Assistant created in the backend");
     res.json(assistant.id);
+    globalAssistantId = assistant.id;
+    console.log("Assistant created in the backend with id:", globalAssistantId);
     
    } 
  catch (error) {
@@ -75,12 +84,13 @@ app.post('/create-thread', async (req, res) => {
   }
 });
 
-app.post('/create-run', async (req, res) => {
+async function createRun(req,res) {
+//app.post('/create-run', async (req, res) => {
   console.log("Creating run")
   try{
     const run = await openai.beta.threads.runs.create(
     req.body.threadId,
-      { assistant_id: req.body.assistantId } 
+      { assistant_id: globalAssistantId } 
     );
     res.json(run.id);
     console.log("Run created in the backend");
@@ -89,7 +99,46 @@ app.post('/create-run', async (req, res) => {
     console.error("Error creating run:", error.response ? error.response.data : error);
     res.status(500).json({ message: "Failed to create run" });
   }
-});
+};
+
+async function add_message_to_thread(thread_id, user_question) {
+    // Create a message inside the thread
+    console.log('Adding message to thread:', user_question);
+    message = await openai.beta.threads.messages.create(
+        thread_id,{
+        role: "user",
+        content: user_question,
+        });
+    return message;
+};
+
+async function get_answer(thread){
+    print("Thinking...");
+    // run assistant
+    print("Running assistant...");
+    run =  await client.beta.threads.runs.create(
+        thread_id=thread.id,
+        assistant_id=globalAssistantId
+    )
+
+    // wait for the run to complete
+    while(True){
+        runInfo = await client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+        if (runInfo.completed_at){
+            // elapsed = runInfo.completed_at - runInfo.created_at
+            // elapsed = time.strftime("%H:%M:%S", time.gmtime(elapsed))
+            print("Run completed");
+            break;
+          }
+        print("Waiting 1sec...");
+        time.sleep(1);
+        }
+    print("All done...");
+    // Get messages from the thread
+    messages = await client.beta.threads.messages.list(thread.id);
+    message_content = messages.data[0].content[0].text.value;
+    return message_content;
+    };
 
 
 app.post('/chat', async (req, res) => {
@@ -138,25 +187,34 @@ app.post('/chat', async (req, res) => {
 app.post('/chatWithAssistant', async (req, res) => {
   const userMessage = req.body.message;
   const threadId = req.body.threadId;
-  console.log('Chatting with assistant');
+  const assistantId = globalAssistantId;
+  console.log('Chatting with assistant with threadId, assistantId:', threadId, assistantId);
   try {
   
   //First we add the user message to the thread
   console.log('Adding message to thread');
-  await openai.beta.threads.messages.create(threadId, {
+   await openai.beta.threads.messages.create(threadId, {
     role: 'user',
     content: userMessage,
     });
+  //await add_message_to_thread(threadId, userMessage);
 
   let timeElapsed = 0;
   const timeout = 60000; // Timeout in milliseconds
   const interval = 5000; // Polling interval in milliseconds
 
+  console.log('Creating run with threadId, assistantId:',threadId, assistantId);
+  const run = await openai.beta.threads.runs.create(
+    threadId,
+    { assistant_id: assistantId }
+  );
   console.log('Starting poll to wait for run to finish');
   
   while (timeElapsed < timeout) {
-    const run = await openai.beta.threads.runs.retrieve(threadId, runId);
-    if (run.status === 'completed') {
+    console.log('Getting run info with threadId, runId',threadId,run.id);
+    const runInfo = await openai.beta.threads.runs.retrieve(thread_id=threadId, run_id=run.id);
+    console.log('Got run information from openAI with run status:', runInfo.status);
+    if (runInfo.status === 'completed') {
       const messagesFromThread = await openai.beta.threads.messages.list(threadId);
       // Resolve or handle the completed run
       console.log('Run completed');

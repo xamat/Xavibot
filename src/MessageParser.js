@@ -7,6 +7,10 @@ class MessageParser {
     this.actionProvider = actionProvider;
     const { threadId } = useContext(ChatbotContext); // Access threadId
     this.threadId = threadId;
+    /* const { runId } = useContext(ChatbotContext); // Access threadId
+    this.runId = runId; */
+    const { assistantId } = useContext(ChatbotContext); // Access assistantId
+    this.assistantId = assistantId;
   }
 
   parse(message) {
@@ -18,12 +22,12 @@ class MessageParser {
       this.actionProvider.handleHelp();
     } else {
       // Send the message to the backend
-      console.log('MessageParser calling ActionProvider with threaId',this.threadId);
-      this.actionProvider.sendMessageToBackend(message);
+      //console.log('MessageParser calling ActionProvider with threaId',this.threadId);
+      //this.actionProvider.sendMessageToBackend(message);
 
       //Use assistant instead
-      //console.log('MessageParser calling ActionProvider with threaId',this.state.threadId);
-      //this.actionProvider.sendMessageToAssistantBackend(message, this.state.threadId);
+      console.log('MessageParser calling ActionProvider with threadId, runId: ', this.threadId, this.assistantId);
+      this.actionProvider.sendMessageToAssistantBackend(message, this.threadId, this.assistantId);
       //this.actionProvider.handleUnknown();
     }
   }

@@ -9,6 +9,7 @@ import axios from 'axios';
 function ChatbotContainer() {
     const [threadId, setThreadId] = useState(null);
     const [assistantId, setAssistantId] = useState(null);
+    const [runId, setRunId] = useState(null);
 
     useEffect(() => {
       const initializeChatbot = async () => {
@@ -25,10 +26,11 @@ function ChatbotContainer() {
           setThreadId(threadResponse.data);
           console.log("Thread created with ID:", threadResponse.data);
   
-          // Step 3: (Optional) Create Run
+          // Step 3: Create Run
           // Create run with both assistantId and threadId
-          await axios.post('http://localhost:3001/create-run', { threadId: threadResponse.data, assistantId: newAssistantId });
-          console.log("Run created");
+          //const runResponse = await axios.post('http://localhost:3001/create-run', { threadId: threadResponse.data, assistantId: newAssistantId });
+          //setRunId(runResponse.data)
+          //console.log("Run created");
   
         } catch (error) {
           console.error('Error initializing chatbot:', error);
@@ -43,7 +45,6 @@ function ChatbotContainer() {
       <Chatbot
         config={config}
         actionProvider={ActionProvider}
-        //messageParser={() => new MessageParser(new ActionProvider())}
         messageParser={MessageParser}
       />
     </ChatbotContext.Provider>
