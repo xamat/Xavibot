@@ -1,4 +1,3 @@
-
 // MessageParser.js
 import React, { useContext } from 'react';
 import ChatbotContext from './ChatbotContext';
@@ -6,7 +5,8 @@ import ChatbotContext from './ChatbotContext';
 class MessageParser {
   constructor(actionProvider) {
     this.actionProvider = actionProvider;
-    this.threadId = this.context.threadId;
+    const { threadId } = useContext(ChatbotContext); // Access threadId
+    this.threadId = threadId;
   }
 
   parse(message) {
@@ -18,7 +18,7 @@ class MessageParser {
       this.actionProvider.handleHelp();
     } else {
       // Send the message to the backend
-      console.log('MessageParser calling ActionProvider with threaId',this.state.threadId);
+      console.log('MessageParser calling ActionProvider with threaId',this.threadId);
       this.actionProvider.sendMessageToBackend(message);
 
       //Use assistant instead
@@ -28,7 +28,6 @@ class MessageParser {
     }
   }
 }
-
 /* class MessageParser {
     constructor(actionProvider, state, options) {
       console.log('Constructing Message Parser');
@@ -43,7 +42,7 @@ class MessageParser {
       }
     }  
   } */
-MessageParser.contextType = ChatbotContext; 
-export default MessageParser;
+  
+  export default MessageParser;
 
  

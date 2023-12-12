@@ -42,8 +42,9 @@ function ChatbotContainer() {
     <ChatbotContext.Provider value={{ threadId, setThreadId }}>
       <Chatbot
         config={config}
-        messageParser={MessageParser}
         actionProvider={ActionProvider}
+        //messageParser={() => new MessageParser(new ActionProvider())}
+        messageParser={MessageParser}
       />
     </ChatbotContext.Provider>
   );
