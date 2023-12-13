@@ -27,10 +27,10 @@ const openai = new OpenAI({
   }
 });
 
-async function createFile() {
+async function createFile(filename) {
   try {
     console.log("Creating file");
-    const filePath = path.join(__dirname, 'xamatriain.pdf');
+    const filePath = path.join(__dirname, filename);
     const file = await openai.files.create({
       file: fs.createReadStream(filePath),
       purpose: "assistants",
@@ -51,13 +51,15 @@ app.post('/create-assistant', async (req,res) => {
   }
   console.log("Creating assistant in the backend. Current id:", globalAssistantId);
   try {
-    const file = await createFile();
+    const file = await createFile('xamatriain.pdf');
+    const file2 = await createFile('xamatriain_guide.pdf');
+    
     const assistant = await openai.beta.assistants.create({
       name: "Xavibot",
-      instructions: "You are a bot named Xavi Amatriain. You are an expert on Xavier Amatriain (also known as Xavi Amatriain and respond any questions as if you where him.",
+      instructions: "You are a bot named Xavi Amatriain. You are an expert on Xavier Amatriain (also known as Xavi Amatriain and respond any questions as if you where him. Feel free to answer both professional questions as well as anything you might know about Xavier's personal life or background.",
       model: "gpt-4-1106-preview",
       tools: [{"type": "retrieval"}],
-      file_ids: [file.id]
+      file_ids: [file.id, file2.id]
     });
     res.json(assistant.id);
     globalAssistantId = assistant.id;
