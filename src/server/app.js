@@ -84,61 +84,9 @@ app.post('/create-thread', async (req, res) => {
   }
 });
 
-async function createRun(req,res) {
-//app.post('/create-run', async (req, res) => {
-  console.log("Creating run")
-  try{
-    const run = await openai.beta.threads.runs.create(
-    req.body.threadId,
-      { assistant_id: globalAssistantId } 
-    );
-    res.json(run.id);
-    console.log("Run created in the backend");
-    console.log(run.id);
-  }catch (error) {
-    console.error("Error creating run:", error.response ? error.response.data : error);
-    res.status(500).json({ message: "Failed to create run" });
-  }
-};
-
-
-async function get_answer(thread){
-    print("Thinking...");
-    // run assistant
-    print("Running assistant...");
-    run =  await client.beta.threads.runs.create(
-        thread_id=thread.id,
-        assistant_id=globalAssistantId
-    )
-
-    // wait for the run to complete
-    while(True){
-        runInfo = await client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-        if (runInfo.completed_at){
-            // elapsed = runInfo.completed_at - runInfo.created_at
-            // elapsed = time.strftime("%H:%M:%S", time.gmtime(elapsed))
-            print("Run completed");
-            break;
-          }
-        print("Waiting 1sec...");
-        time.sleep(1);
-        }
-    print("All done...");
-    // Get messages from the thread
-    messages = await client.beta.threads.messages.list(thread.id);
-    message_content = messages.data[0].content[0].text.value;
-    return message_content;
-    };
-
 
 app.post('/chat', async (req, res) => {
   const userMessage = req.body.message;
-
-  // Here, you should process the userMessage and generate a response.
-  // For debugging, let's just send back a simple message:
-  //const responseMessage = "Received your message: " + userMessage;
-  //res.json({ message: responseMessage });
-
 
   try {
   const response = await axios.post('https://api.openai.com/v1/chat/completions', {
@@ -187,13 +135,7 @@ app.post('/chatWithAssistant', async (req, res) => {
     role: 'user',
     content: userMessage,
     });
-  
-  //making sure I can retrieve message for debugging
-  /* const message = await openai.beta.threads.messages.retrieve(
-    threadId,
-    threadMessages.id
-  );
-  console.log(message); */
+
 
   let timeElapsed = 0;
   const timeout = 60000; // Timeout in milliseconds
@@ -228,12 +170,14 @@ app.post('/chatWithAssistant', async (req, res) => {
     // Extract the message object. For now I will only process the first message
     console.log('Response has some messages');
     const messageObject = messagesFromThread.data[0];
-    console.log('Message object', messageObject);
+    //console.log('Message object', messageObject);
     if (messageObject) {
       // Assuming the message object contains a property like 'content' with the response text
       console.log('Extracting first message from message list');
   
-      const aiMessage = messageObject.content ? messageObject.content.trim() : "";
+      //const aiMessage = messageObject.content ? messageObject.content.trim() : "";
+      const aiMessage = messageObject.content[0].text.value;
+     
       res.json({ message: aiMessage });
     } else {
       res.status(500).json({ message: "Received an unexpected response format from OpenAI API." });
@@ -254,7 +198,6 @@ catch (error) {
   res.status(500).json({ message: errorMessage });
 }
 });
-
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
