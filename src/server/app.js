@@ -8,8 +8,19 @@ const fs = require('fs');
 const path = require('path');
 
 app.use(express.json());
-// Enable CORS for all routes
-app.use(cors());
+
+const corsOptions = {
+  origin: function (origin, callback) {
+      const allowedOrigins = ['https://amatriain.net','https://xavibot-server.azurewebsites.net/', 'http://localhost:3000'];
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+          callback(null, true);
+      } else {
+          callback(new Error('Not allowed by CORS'));
+      }
+  }
+};
+
+app.use(cors(corsOptions));
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
 
 // Global variable to store assistantId
