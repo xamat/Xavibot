@@ -16,8 +16,42 @@ app.use(cors());
 let globalAssistantId = null;
 
 
-//const openai = OpenAI.Beta.Assistants.create({
-//const openai = axios.create({
+const { ClientSecretCredential } = require("@azure/identity");
+const { SecretClient } = require("@azure/keyvault-secrets");
+
+async function getSecretFromKeyVault() {
+    const tenantId = process.env.AZURE_TENANT_ID;
+    const clientId = process.env.AZURE_CLIENT_ID;
+    const clientSecret = process.env.AZURE_CLIENT_SECRET;
+    console.log('Getting API key from Azure vault')
+    // The URL to the Key Vault. Replace with your Key Vault URL.
+    const keyVaultUrl = "https://Xavibot-OpenAI.vault.azure.net/";
+
+    // The name of the secret in the Key Vault. Replace with your secret's name.
+    const secretName = "OpenAI-API-Key";
+
+    // Using DefaultAzureCredential for simplicity. This will work in many Azure environments.
+    const credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+
+    // Build the secret client
+    const client = new SecretClient(keyVaultUrl, credential);
+
+    try {
+        // Retrieve the secret from Azure Key Vault
+        const retrievedSecret = await client.getSecret(secretName);
+
+        // Here, you can set the environment variable, or return the secret value
+        process.env.OPENAI_API_KEY = retrievedSecret.value;
+
+        console.log("Secret retrieved from Azure Key Vault:", retrievedSecret.value);
+    } catch (err) {
+        console.error("Error retrieving secret from Azure Key Vault:", err);
+    }
+}
+
+// Get the OpenAI key from Azure
+getSecretFromKeyVault();
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   baseURL: 'https://api.openai.com/v1',
