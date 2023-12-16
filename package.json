@@ -29,7 +29,7 @@
     "dev": "concurrently \"npm run start\" \"npm run dev-server\"",
     "build": "react-scripts build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
