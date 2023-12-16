@@ -7,17 +7,11 @@ The backend is developedin Node.js and uses [OpenAI's Assistant API](https://pla
 
 In the project directory, you can run:
 
-"scripts": {
-    "start": "node src/server/app.js",
-    "start-frontend": "react-scripts start",
-    "start-server": "node src/server/app.js",
-    "dev-server": "nodemon src/server/app.js",
-    "dev": "concurrently \"npm run start\" \"npm run dev-server\""
-
 ### `npm start`or  `npm start-server`
 
 Runs the server.
 Open [http://localhost:3001](http://localhost:3001) to view the different endpoints.
+Note that the actual URL for the server should be defined in the REACT_APP_API_URL of your .env file.
 
 ### `npm start-frontend`
 
@@ -30,3 +24,13 @@ Launches the server using nodemon so that it will restart whenever you change co
 ### `npm dev`
 
 Uses concurrently to launch both the server and the frontend.
+
+## Environment variables
+
+
+OPENAI_API_KEY
+AZURE_CLIENT_ID
+AZURE_TENANT_ID
+AZURE_CLIENT_SECRET
+
+REACT_APP_API_URL=http://localhost:3001
