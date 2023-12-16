@@ -135,6 +135,9 @@ app.post('/create-thread', async (req, res) => {
   }
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).send('Server is up and running');
+});
 
 app.post('/chat', async (req, res) => {
   const userMessage = req.body.message;
