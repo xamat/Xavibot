@@ -29,8 +29,13 @@ Uses concurrently to launch both the server and the frontend.
 
 
 OPENAI_API_KEY
+
+I am using Azure to deploy the server and store the OpenAI key remotely. You might not need this. Make sure to modify the app.js file accordingly.
+
 AZURE_CLIENT_ID
 AZURE_TENANT_ID
 AZURE_CLIENT_SECRET
 
-REACT_APP_API_URL=http://localhost:3001
+Where you want to deploy the server. I recommend http://localhost:3001 for development.
+
+REACT_APP_API_URL
