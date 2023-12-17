@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Xavibot/static/css/main.dca9233f.css",
+    "main.js": "/Xavibot/static/js/main.06cf5877.js",
+    "index.html": "/Xavibot/index.html",
+    "main.dca9233f.css.map": "/Xavibot/static/css/main.dca9233f.css.map",
+    "main.06cf5877.js.map": "/Xavibot/static/js/main.06cf5877.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dca9233f.css",
+    "static/js/main.06cf5877.js"
+  ]
+}
