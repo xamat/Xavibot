@@ -26,7 +26,7 @@
     "start-frontend": "react-scripts start",
     "start-server": "node src/server/app.js",
     "dev-server": "nodemon src/server/app.js",
-    "dev": "concurrently \"npm run start\" \"npm run dev-server\"",
+    "dev": "concurrently \"npm run start-frontend\" \"npm run dev-server\"",
     "build": "react-scripts build",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
