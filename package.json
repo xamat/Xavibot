@@ -29,8 +29,8 @@
     "dev": "concurrently \"npm run start-frontend\" \"npm run dev-server\"",
     "build": "react-scripts build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
-  },
+    "deploy": "gh-pages -d build -r https://${GH_TOKEN}@github.com/xamat/Xavibot.git" 
+   },
   "eslintConfig": {
     "extends": [
       "react-app",
