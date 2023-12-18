@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "/subscriptions/6de297ff-a0a7-4af4-9aae-a67cc690e08d/resourceGroups/Xavibot-server-resource-group/providers/Microsoft.Web/sites/Xavibot-server",
-    "appService.deploySubpath": "."
-}
