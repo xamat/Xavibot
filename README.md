@@ -25,17 +25,24 @@ Launches the server using nodemon so that it will restart whenever you change co
 
 Uses concurrently to launch both the server and the frontend.
 
+### `npm build`
+
+Builds react front-end
+
+### `npm deploy`
+
+Builds react front-end and deploys to github. Note that if you use this script you should edit the remote github URL to yours and possibly define GH_TOKEN locally if you are using token based authentication.
+
 ## Environment variables
 
+### OPENAI_API_KEY
 
-OPENAI_API_KEY
+You can copy your OpenAI key here directly for local development
+
+### AZURE_CLIENT_ID, AZURE_TENANT_ID, and AZURE_CLIENT_SECRET
 
 I am using Azure to deploy the server and store the OpenAI key remotely. You might not need this. Make sure to modify the app.js file accordingly.
 
-AZURE_CLIENT_ID
-AZURE_TENANT_ID
-AZURE_CLIENT_SECRET
+### REACT_APP_API_URL
 
 Where you want to deploy the server. I recommend http://localhost:3001 for development.
-
-REACT_APP_API_URL
