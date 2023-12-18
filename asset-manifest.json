@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/Xavibot/static/css/main.dca9233f.css",
-    "main.js": "/Xavibot/static/js/main.ebe80914.js",
+    "main.js": "/Xavibot/static/js/main.02d64ddb.js",
     "index.html": "/Xavibot/index.html",
     "main.dca9233f.css.map": "/Xavibot/static/css/main.dca9233f.css.map",
-    "main.ebe80914.js.map": "/Xavibot/static/js/main.ebe80914.js.map"
+    "main.02d64ddb.js.map": "/Xavibot/static/js/main.02d64ddb.js.map"
   },
   "entrypoints": [
     "static/css/main.dca9233f.css",
-    "static/js/main.ebe80914.js"
+    "static/js/main.02d64ddb.js"
   ]
 }
