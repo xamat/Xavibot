@@ -92,6 +92,7 @@ async function createFile(filename) {
 app.post('/create-assistant', async (req,res) => {
   if(globalAssistantId!=null){
     console.log("Assistant has already been created in the backend with id:", globalAssistantId);
+    res.json(globalAssistantId);
     return;
   }
   console.log("Creating assistant in the backend. Current id:", globalAssistantId);

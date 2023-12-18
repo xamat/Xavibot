@@ -28,6 +28,7 @@ class ActionProvider {
 
     async sendMessageToBackend(userMessage) {
       const apiUrl = process.env.REACT_APP_API_URL;  
+      console.log('Calling server at:', apiUrl);
       try {
           const response = await axios.post(`${apiUrl}/chat`, { message: userMessage });
           const botMessage = response.data.message;
