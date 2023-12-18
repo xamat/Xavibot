@@ -3,7 +3,7 @@ import axios from 'axios';
 
 class ActionProvider {
     constructor(createChatBotMessage, setStateFunc, createClientMessage) {
-      console.log('Constructing Action Provider');
+      //console.log('Constructing Action Provider');
       this.createChatBotMessage = createChatBotMessage;
       this.setState = setStateFunc;
       this.createClientMessage = createClientMessage;
