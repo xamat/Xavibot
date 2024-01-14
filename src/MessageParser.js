@@ -1,6 +1,4 @@
 // MessageParser.js
-import React,{ useContext } from 'react';
-//import ChatbotContext from './ChatbotContext';
 import globalState from './GlobalState';
 
 class MessageParser {
