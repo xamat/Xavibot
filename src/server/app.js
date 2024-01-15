@@ -54,7 +54,7 @@ async function getSecretFromKeyVault() {
         // Here, you can set the environment variable, or return the secret value
         process.env.OPENAI_API_KEY = retrievedSecret.value;
 
-        console.log("Secret retrieved from Azure Key Vault:", retrievedSecret.value);
+        //console.log("Secret retrieved from Azure Key Vault:", retrievedSecret.value);
     } catch (err) {
         console.error("Error retrieving secret from Azure Key Vault:", err);
     }
