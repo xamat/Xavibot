@@ -31,6 +31,7 @@ import axios from 'axios';
     return (
         <Chatbot
             config={config}
+            headerText='Xavibot'
             actionProvider={ActionProvider}
             messageParser={MessageParser}
         />

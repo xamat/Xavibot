@@ -8,7 +8,6 @@ class MessageParser {
   }
 
   parse(message) {
-    //const { threadId, assistantId } = this.getContext();
     const threadId = globalState.threadId;
     const assistantId = globalState.assistantId;
 
@@ -24,7 +23,7 @@ class MessageParser {
       //this.actionProvider.sendMessageToBackend(message);
 
       //Use assistant instead
-      console.log('MessageParser calling ActionProvider with threadId, assistantId: ', threadId, assistantId);
+      //console.log('MessageParser calling ActionProvider with threadId, assistantId: ', threadId, assistantId);
       this.actionProvider.sendMessageToAssistantBackend(message, threadId, assistantId);
       
       //this.actionProvider.handleUnknown();

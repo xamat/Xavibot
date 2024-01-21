@@ -23,6 +23,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
 
+
 // Global variable to store assistantId
 let globalAssistantId = null;
 
@@ -71,6 +72,30 @@ const openai = new OpenAI({
     'Content-Type': 'application/json'
   }
 });
+
+//Utils for development only
+
+async function deleteAllFiles() {
+  const list = await openai.files.list();
+
+  for await (const file of list) {
+    //console.log(file);
+    await openai.files.del(file.id);
+  }
+}
+
+async function deleteAllAssistants() {
+  const myAssistants = await openai.beta.assistants.list({
+    order: "desc",
+  });
+  for await (const assistant of myAssistants){
+    await openai.beta.assistants.del(assistant.id);
+  }
+}
+
+//For now I will make sure I delete all existing assistants and files when creating one, but need to clean this
+//deleteAllAssistants();
+//deleteAllFiles();
 
 async function createFile(filename) {
   try {
@@ -232,21 +257,51 @@ app.post('/chatWithAssistant', async (req, res) => {
     timeElapsed += interval;
   }
 
-  //console.log('Attempting to extract messages from response', messagesFromThread);
-  console.log('First message is:', messagesFromThread.data[0].content[0].text.value);
   
   if (messagesFromThread.data.length > 0 && messagesFromThread.data[0].content.length > 0) {
-    // Extract the message object. For now I will only process the first message
+    // Extract the message object. 
     console.log('Response has some messages');
     const messageObject = messagesFromThread.data[0];
+    //console.log('Attempting to extract messages from response', messagesFromThread);
+    
     //console.log('Message object', messageObject);
     if (messageObject) {
       // Assuming the message object contains a property like 'content' with the response text
       console.log('Extracting first message from message list');
+      console.log('First message is:', messagesFromThread.data[0].content[0]);
   
-      //const aiMessage = messageObject.content ? messageObject.content.trim() : "";
       const aiMessage = messageObject.content[0].text.value;
      
+      //extract citations
+      let annotations = messageObject.content.annotations;
+      let citations = [];
+
+        if(annotations && annotations.length>0){
+          console.log('Response has annotations', annotations);
+      
+          // Iterate over the annotations and add footnotes
+          annotations.forEach((annotation, index) => {
+          // Replace the text with a footnote
+          aiMessage.value = aiMessage.value.replace(annotation.text, ` [${index}]`);
+
+          // Gather citations based on annotation attributes
+          let fileCitation = annotation.file_citation;
+          if (fileCitation) {
+              let citedFile = client.files.retrieve(fileCitation.file_id);
+              citations.push(`[${index}] ${fileCitation.quote} from ${citedFile.filename}`);
+          } else {
+              let filePath = annotation.file_path;
+              if (filePath) {
+                  let citedFile = client.files.retrieve(filePath.file_id);
+                  citations.push(`[${index}] Click <here> to download ${citedFile.filename}`);
+                  // Note: File download functionality not implemented above for brevity
+              }
+          }
+        });
+
+        // Add footnotes to the end of the message before displaying to user
+        aiMessage.value += '\n' + citations.join('\n');
+      };
       res.json({ message: aiMessage });
     } else {
       res.status(500).json({ message: "Received an unexpected response format from OpenAI API." });

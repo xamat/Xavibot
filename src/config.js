@@ -1,16 +1,24 @@
+// Config starter code
+  
+  import { createChatBotMessage } from 'react-chatbot-kit';
 
-  
-  
-  // Config starter code
-  import { createChatBotMessage } from "react-chatbot-kit";
-  
   const config = {
-    initialMessages: [createChatBotMessage(`This is a chatbot designed to respond as Xavi Amatriain. 
-    It uses OpenAI's Assistants API, which is in Beta. If anything fails, and, for example, you get an Unhandled Exception, blame OpenAI.
-    For more details on how this chatbot was created, read the blogpost (https://amatriain.net/blog/aidevelopment), which provides
-    a link to the codebase in Github among other things.\n 
-    
-    All that being said, how can I help you human? `)],
+    initialMessages: [
+      createChatBotMessage(
+        <div 
+        dangerouslySetInnerHTML={{ __html:`This is a chatbot designed to respond as Xavi Amatriain.<br> 
+        <p>It uses <a href="https://platform.openai.com/docs/assistants/overview" target="_blank" rel="noopener noreferrer">OpenAI's Assistants API</a>, which is in Beta and not super stable. If anything fails, and, for example, you get an 
+        Exception, blame OpenAI :-) .</p>
+        <p>
+        For more details on how this chatbot was created, read the <a href="https://amatriain.net/blog/aidevelopment" target="_blank" rel="noopener noreferrer">blogpost</a>.It provides
+        a link to the codebase in Github among other things.</p>
+        All that being said, how can I help you today, human? `
+         }}>
+      </div>
+      ),
+      
+    ],
+    // ... other config options
     botName: 'XaviBot',
     customStyles: {
         botMessageBox: {
@@ -20,7 +28,13 @@
           backgroundColor: '#5ccc9d',
         },
       },
-  }
+      state: {
+        gist: '',
+        infoBox: '',
+      },
+      widgets: [],
+  };
+
   
-  export default config
+  export default config;
   

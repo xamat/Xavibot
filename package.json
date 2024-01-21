@@ -15,7 +15,7 @@
     "nvm": "^0.0.4",
     "openai": "^4.20.1",
     "react": "^18.2.0",
-    "react-chatbot-kit": "^2.1.2",
+    "react-chatbot-kit": "^2.2.2",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
@@ -29,9 +29,9 @@
     "dev": "concurrently \"npm run start-frontend\" \"npm run dev-server\"",
     "build": "react-scripts build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build -r https://${GH_TOKEN}@github.com/xamat/Xavibot.git", 
+    "deploy": "gh-pages -d build -r https://${GH_TOKEN}@github.com/xamat/Xavibot.git",
     "echo-token": "echo $GH_TOKEN"
-   },
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
