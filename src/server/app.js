@@ -93,8 +93,9 @@ async function deleteAllAssistants() {
   }
 }
 
-//For now I will make sure I delete all existing assistants and files when creating one, but need to clean this
+//Make sure I delete all existing assistants and files when creating one, but need to clean this
 //deleteAllAssistants();
+//createAssistant(res);
 //deleteAllFiles();
 
 async function createFile(filename) {
@@ -114,13 +115,7 @@ async function createFile(filename) {
   }
 }
 
-app.post('/create-assistant', async (req,res) => {
-  if(globalAssistantId!=null){
-    console.log("Assistant has already been created in the backend with id:", globalAssistantId);
-    res.json(globalAssistantId);
-    return;
-  }
-  console.log("Creating assistant in the backend. Current id:", globalAssistantId);
+async function createAssistant(res) {
   try {
     const file = await createFile('xamatriain.pdf');
     const file2 = await createFile('xamatriain_guide.pdf');
@@ -155,6 +150,27 @@ app.post('/create-assistant', async (req,res) => {
  catch (error) {
     console.error("Error creating assistant:", error.response ? error.response.data : error);
   }
+};
+
+app.post('/get-assistant', async (req,res) => {
+  const myAssistants = await openai.beta.assistants.list({
+    order: "desc",
+    limit: "1",
+  });
+  //console.log("Retrieved assistants list", myAssistants.data);
+  globalAssistantId = myAssistants.data[0].id;
+  res.json(globalAssistantId);
+  return;
+});
+
+app.post('/create-assistant', async (req,res) => {
+  if(globalAssistantId!=null){
+    console.log("Assistant has already been created in the backend with id:", globalAssistantId);
+    res.json(globalAssistantId);
+    return;
+  }
+  console.log("Creating assistant in the backend. Current id:", globalAssistantId);
+  createAssistant(res);
 });
 
 app.post('/create-thread', async (req, res) => {
@@ -262,17 +278,23 @@ app.post('/chatWithAssistant', async (req, res) => {
     // Extract the message object. 
     console.log('Response has some messages');
     const messageObject = messagesFromThread.data[0];
-    //console.log('Attempting to extract messages from response', messagesFromThread);
+    /* Debugging for trying to get annotations to work
+    console.log('Attempting to extract messages from response', messagesFromThread);
     
-    //console.log('Message object', messageObject);
+    console.log('Message object', messageObject);
+    console.log('Message object content', messageObject.content);*/
+    
     if (messageObject) {
       // Assuming the message object contains a property like 'content' with the response text
+       /* Debugging for trying to get annotations to work
       console.log('Extracting first message from message list');
       console.log('First message is:', messagesFromThread.data[0].content[0]);
-  
+      console.log('Annotations are:',messageObject.content.annotations )
+      console.log('Annotations are:',messageObject.content[0].annotations )*/
+
       const aiMessage = messageObject.content[0].text.value;
      
-      //extract citations
+      //extract citations. Note: unfortunately this doesn't work as my annotations object is always null
       let annotations = messageObject.content.annotations;
       let citations = [];
 

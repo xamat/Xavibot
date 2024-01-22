@@ -13,10 +13,12 @@ import axios from 'axios';
                 const apiUrl = process.env.REACT_APP_API_URL;
 
                 // Create Assistant and store its ID
-                const assistantResponse = await axios.post(`${apiUrl}/create-assistant`);
+               // const assistantResponse = await axios.post(`${apiUrl}/create-assistant`);
+               // Instead of creating Assistant every time, just get last assistant created
+                const assistantResponse = await axios.post(`${apiUrl}/get-assistant`);
                 globalState.setAssistantId(assistantResponse.data);
                 console.log('Chatbot Initialized with AssistantId:',globalState.assistantId);
-
+                
                 // Create Thread and Update Global State
                 const threadResponse = await axios.post(`${apiUrl}/create-thread`);
                 globalState.setThreadId(threadResponse.data);
