@@ -7,9 +7,7 @@
       createChatBotMessage(
         <div 
         dangerouslySetInnerHTML={{ __html:`This is a chatbot designed to respond as Xavi Amatriain.<br> 
-        <p>It uses <a href="https://platform.openai.com/docs/assistants/overview" target="_blank" rel="noopener noreferrer">OpenAI's Assistants API</a>, which is in Beta and not super stable. If anything fails, and, for example, you get an 
-        Exception, blame OpenAI :-) .</p>
-        <p>
+        <p>It uses <a href="https://platform.openai.com/docs/assistants/overview" target="_blank" rel="noopener noreferrer">OpenAI's Assistants API</a>.
         For more details on how this chatbot was created, read the <a href="https://amatriain.net/blog/aidevelopment" target="_blank" rel="noopener noreferrer">blogpost</a>.It provides
         a link to the codebase in Github among other things.</p>
         All that being said, how can I help you today, human? `
