@@ -18,7 +18,7 @@ app.use(express.json());
           callback(new Error('Not allowed by CORS'));
       }
   }
-};*/
+};*/  
 
 //app.use(cors(corsOptions));
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
