@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
-const cors = require('cors');
+//const cors = require('cors');
 const app = express();
 const { OpenAI } = require('openai');
 const fs = require('fs');
@@ -9,18 +9,18 @@ const path = require('path');
 
 app.use(express.json());
 
-const corsOptions = {
+/*const corsOptions = {
   origin: function (origin, callback) {
-      const allowedOrigins = ['https://amatriain.net','https://xavibot-server.azurewebsites.net/', 'http://localhost:3000'];
+      const allowedOrigins = ['https://amatria.in','https://amatriain.net','https://xavibot-server.azurewebsites.net/', 'http://localhost:3000'];
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
           callback(null, true);
       } else {
           callback(new Error('Not allowed by CORS'));
       }
   }
-};
+};*/
 
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
 
 
