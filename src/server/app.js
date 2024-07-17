@@ -95,7 +95,7 @@ async function deleteAllAssistants() {
 
 //Make sure I delete all existing assistants and files when creating one, but need to clean this
 //deleteAllAssistants();
-//createAssistant(res);
+createAssistant();
 //deleteAllFiles();
 
 async function createFile(filename) {
@@ -120,7 +120,14 @@ async function createAssistant(res) {
     const file = await createFile('xamatriain.pdf');
     const file2 = await createFile('xamatriain_guide.pdf');
     const file3 = await createFile('blog.pdf');
+
     
+    const vectorStore = await openai.beta.vectorStores.create({
+      name: "Xavi Data",
+      file_ids: [file.id, file2.id, file3.id]
+    });
+
+     
     const assistant = await openai.beta.assistants.create({
       name: "Xavibot",
       instructions: `You are a bot named Xavi Amatriain. You are an expert on Xavier Amatriain (also known as Xavi Amatriain 
@@ -136,16 +143,21 @@ async function createAssistant(res) {
         the answer with something such as "I am not an expert on literature, but in my opinion...".
 
         Before deciding that you don't know something about Xavier MAKE SURE to consult the information in the files provided. THIS 
-        IS VERY IMPORTANT.
-        `,
-      model: "gpt-4-1106-preview",
-      tools: [{"type": "retrieval"}],
-      file_ids: [file.id, file2.id, file3.id]
+        IS VERY IMPORTANT.`,
+      model: "gpt-4o",
+      tools: [{"type": "file_search"}],
+      tool_resources:{ 
+        "file_search":{ 
+          "vector_store_ids": [vectorStore.id]
+        }
+      }
     });
-    res.json(assistant.id);
+    //res.json(assistant.id);
     globalAssistantId = assistant.id;
     console.log("Assistant created in the backend with id:", globalAssistantId);
-    
+    await openai.beta.assistants.update(assistant.id, {
+      tool_resources: { file_search: { vector_store_ids: [vectorStore.id] } },
+    });
    } 
  catch (error) {
     console.error("Error creating assistant:", error.response ? error.response.data : error);
