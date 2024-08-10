@@ -17,11 +17,11 @@ Note that the actual URL for the server should be defined in the REACT_APP_API_U
 
 Launches the React frontend. Open [http://localhost:3000](http://localhost:3000)
 
-### `npm dev-server`
+### `npm run dev-server`
 
 Launches the server using nodemon so that it will restart whenever you change code while developing.
 
-### `npm dev`
+### `npm run dev`
 
 Uses concurrently to launch both the server and the frontend.
 

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
-//const cors = require('cors');
+const cors = require('cors');
 const app = express();
 const { OpenAI } = require('openai');
 const fs = require('fs');
@@ -9,7 +9,7 @@ const path = require('path');
 
 app.use(express.json());
 
-/*const corsOptions = {
+const corsOptions = {
   origin: function (origin, callback) {
       const allowedOrigins = ['https://amatria.in','https://amatriain.net','https://xavibot-server.azurewebsites.net/', 'http://localhost:3000'];
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -18,9 +18,9 @@ app.use(express.json());
           callback(new Error('Not allowed by CORS'));
       }
   }
-};*/  
+};  
 
-//app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
 
 
@@ -31,38 +31,42 @@ let globalAssistantId = null;
 const { ClientSecretCredential } = require("@azure/identity");
 const { SecretClient } = require("@azure/keyvault-secrets");
 
-async function getSecretFromKeyVault() {
+function getSecretFromKeyVault() {
     const tenantId = process.env.AZURE_TENANT_ID;
     const clientId = process.env.AZURE_CLIENT_ID;
     const clientSecret = process.env.AZURE_CLIENT_SECRET;
     console.log('Getting API key from Azure vault')
     // The URL to the Key Vault. Replace with your Key Vault URL.
-    const keyVaultUrl = "https://Xavibot-OpenAI.vault.azure.net/";
+    const keyVaultUrl = "https://xavibot-openai.vault.azure.net";
 
     // The name of the secret in the Key Vault. Replace with your secret's name.
-    const secretName = "OpenAI-API-Key";
+    const secretName = "OPENAI-API-KEY";
 
     // Using DefaultAzureCredential for simplicity. This will work in many Azure environments.
     const credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+    console.log("Retriving credential with tenantId",tenantId);
+    console.log("Retriving credential with clienttid", clientId);
+    console.log("Retriving credential with clientSecret",clientSecret);
+    console.log("Retriving credential with credential",credential);
 
     // Build the secret client
     const client = new SecretClient(keyVaultUrl, credential);
 
     try {
         // Retrieve the secret from Azure Key Vault
-        const retrievedSecret = await client.getSecret(secretName);
+        const retrievedSecret = client.getSecret(secretName);
 
         // Here, you can set the environment variable, or return the secret value
         process.env.OPENAI_API_KEY = retrievedSecret.value;
 
-        //console.log("Secret retrieved from Azure Key Vault:", retrievedSecret.value);
+        console.log("Secret retrieved from Azure Key Vault:", retrievedSecret.value);
     } catch (err) {
         console.error("Error retrieving secret from Azure Key Vault:", err);
     }
 }
 
 // Get the OpenAI key from Azure - comment out to use local key
-getSecretFromKeyVault();
+//getSecretFromKeyVault();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
