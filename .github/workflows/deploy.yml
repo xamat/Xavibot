@@ -37,6 +37,8 @@ jobs:
       
     - name: Build
       run: NODE_OPTIONS='--openssl-legacy-provider' npm run build
+      env:
+        REACT_APP_API_URL: https://xavibot-backend-852440180218.us-central1.run.app
       
     - name: Setup Pages
       uses: actions/configure-pages@v4
