@@ -1,5 +1,4 @@
 // MessageParser.js
-import globalState from './GlobalState';
 
 class MessageParser {
   
