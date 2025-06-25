@@ -2,6 +2,7 @@
   "name": "chatbot-ui",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://amatria.in",
   "dependencies": {
     "@google-cloud/secret-manager": "^5.0.0",
     "@google-cloud/functions-framework": "^3.1.0",
