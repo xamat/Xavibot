@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import globalState from './GlobalState.js';
 import config from './config.js';
 import MessageParser from './MessageParser.js';
@@ -6,38 +6,54 @@ import ActionProvider from './ActionProvider.js';
 import Chatbot from 'react-chatbot-kit';
 import axios from 'axios';
 
-  function ChatbotContainer() {
-    useEffect(() => {
-        const initializeChatbot = async () => {
-            try {
-                const apiUrl = process.env.REACT_APP_API_URL;
+function ChatbotContainer() {
+  const [isInitialized, setIsInitialized] = useState(false);
 
-                // Create Assistant and store its ID
-               // const assistantResponse = await axios.post(`${apiUrl}/create-assistant`);
-               // Instead of creating Assistant every time, just get last assistant created
-                const assistantResponse = await axios.post(`${apiUrl}/get-assistant`);
-                globalState.setAssistantId(assistantResponse.data);
-                console.log('Chatbot Initialized with AssistantId:',globalState.assistantId);
-                
-                // Create Thread and Update Global State
-                const threadResponse = await axios.post(`${apiUrl}/create-thread`);
-                globalState.setThreadId(threadResponse.data);
-                console.log('Chatbot Initialized with ThreadId:',globalState.threadId);
-            } catch (error) {
-                console.error('Error initializing chatbot:', error);
-            }
-        };
-        initializeChatbot();
-    }, []);
+  useEffect(() => {
+    const initializeChatbot = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
 
-    return (
-        <Chatbot
-            config={config}
-            headerText='Xavibot'
-            actionProvider={ActionProvider}
-            messageParser={MessageParser}
-        />
-    );
+        // Create Assistant and store its ID
+        const assistantResponse = await axios.post(`${apiUrl}/get-assistant`);
+        globalState.setAssistantId(assistantResponse.data);
+        
+        // Create Thread and Update Global State
+        const threadResponse = await axios.post(`${apiUrl}/create-thread`);
+        globalState.setThreadId(threadResponse.data);
+        
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Error initializing chatbot:', error);
+      }
+    };
+    
+    initializeChatbot();
+  }, []);
+
+  // Create a custom ActionProvider class that doesn't require authentication
+  class CustomActionProvider extends ActionProvider {
+    constructor(createChatBotMessage, setStateFunc, createClientMessage) {
+      super(createChatBotMessage, setStateFunc, createClientMessage, null);
+      
+      // Set the thread and assistant IDs after initialization
+      this.setThreadId(globalState.threadId);
+      this.setAssistantId(globalState.assistantId);
+    }
   }
-  
- export default ChatbotContainer;
+
+  if (!isInitialized) {
+    return <div>Initializing chatbot...</div>;
+  }
+
+  return (
+    <Chatbot
+      config={config}
+      headerText='Xavibot'
+      actionProvider={CustomActionProvider}
+      messageParser={MessageParser}
+    />
+  );
+}
+
+export default ChatbotContainer;

@@ -24,3 +24,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+#test and unused files
+public/test.html
+src/GoogleSignIn.js

@@ -1,6 +1,7 @@
 // Config starter code
   
   import { createChatBotMessage } from 'react-chatbot-kit';
+  import React from 'react';
 
   const config = {
     initialMessages: [

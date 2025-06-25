@@ -8,25 +8,15 @@ class MessageParser {
   }
 
   parse(message) {
-    const threadId = globalState.threadId;
-    const assistantId = globalState.assistantId;
-
     const lowerCaseMessage = message.toLowerCase();
 
     if (lowerCaseMessage.includes("hello")) {
-      this.actionProvider.greet();
+      this.actionProvider.handleHello();
     } else if (lowerCaseMessage.includes("help")) {
       this.actionProvider.handleHelp();
     } else {
-      // Send the message to the backend
-      //console.log('MessageParser calling ActionProvider with threaId',this.threadId);
-      //this.actionProvider.sendMessageToBackend(message);
-
-      //Use assistant instead
-      //console.log('MessageParser calling ActionProvider with threadId, assistantId: ', threadId, assistantId);
-      this.actionProvider.sendMessageToAssistantBackend(message, threadId, assistantId);
-      
-      //this.actionProvider.handleUnknown();
+      // Send the message to the assistant backend
+      this.actionProvider.sendMessageToAssistantBackend(message);
     }
   }
 }

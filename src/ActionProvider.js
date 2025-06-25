@@ -2,16 +2,36 @@
 import axios from 'axios';
 
 class ActionProvider {
-    constructor(createChatBotMessage, setStateFunc, createClientMessage) {
-      //console.log('Constructing Action Provider');
+    constructor(createChatBotMessage, setStateFunc, createClientMessage, idToken) {
       this.createChatBotMessage = createChatBotMessage;
       this.setState = setStateFunc;
       this.createClientMessage = createClientMessage;
+      this.idToken = idToken;
+      this.threadId = null;
+      this.assistantId = null;
       this.sendMessageToBackend = this.sendMessageToBackend.bind(this);
       this.sendMessageToAssistantBackend = this.sendMessageToAssistantBackend.bind(this);
     }
   
+    setThreadId(threadId) {
+      this.threadId = threadId;
+    }
+
+    setAssistantId(assistantId) {
+      this.assistantId = assistantId;
+    }
+
+    addBotMessage(message) {
+      const botMessage = this.createChatBotMessage(message);
+      this.updateChatbotState(botMessage);
+    }
+  
     greet() {
+      const greetingMessage = this.createChatBotMessage("Hello! How can I help you?");
+      this.updateChatbotState(greetingMessage);
+    }
+  
+    handleHello() {
       const greetingMessage = this.createChatBotMessage("Hello! How can I help you?");
       this.updateChatbotState(greetingMessage);
     }
@@ -28,48 +48,50 @@ class ActionProvider {
 
     async sendMessageToBackend(userMessage) {
       const apiUrl = process.env.REACT_APP_API_URL;  
-      console.log('Calling server at:', apiUrl);
+      
       try {
-          const response = await axios.post(`${apiUrl}/chat`, { message: userMessage });
-          const botMessage = response.data.message;
-          
-          // Method to add the bot's response to the chat
-          this.addMessageToChat(botMessage);
-        } catch (error) {
-          console.error('Error sending message to backend:', error);
-          console.log('Error');
-          //this.handleUnknown();
-          // Handle the error (e.g., by displaying an error message in the chat)
-          
-          this.addMessageToChat("Caught Exception: Error sending message to backend");
-        }
-      }
-
-      async sendMessageToAssistantBackend(userMessage, threadId, assistantId) {
-        console.log('Sending Message to Assistant Backend with threaId, assistantId:',threadId, assistantId);
+        const response = await axios.post(`${apiUrl}/chatWithAssistant`, {
+          message: userMessage,
+          threadId: this.threadId,
+          assistantId: this.assistantId
+        });
         
-        const apiUrl = process.env.REACT_APP_API_URL;
-        try {
-          const response = await axios.post(`${apiUrl}/chatWithAssistant`, { message: userMessage, threadId: threadId, assistantId: assistantId });
-          const botMessage = response.data.message;
-          
-          // Method to add the bot's response to the chat
-          this.addMessageToChat(botMessage);
-        } catch (error) {
-          console.error('Error sending message to backend:', error);
-          console.log('Error');
-          //this.handleUnknown();
-          // Handle the error (e.g., by displaying an error message in the chat)
-          
-          this.addMessageToChat("Caught Exception: Error sending message to backend");
+        if (response.data && response.data.message) {
+          this.addBotMessage(response.data.message);
+        } else {
+          this.addBotMessage('Sorry, I received an empty response from the server.');
         }
+      } catch (error) {
+        console.error('Error communicating with backend:', error);
+        this.addBotMessage('Sorry, I encountered an error while processing your message.');
       }
-    
-    
-      addMessageToChat(message) {
-        const chatMessage = this.createChatBotMessage(message);
-        this.updateChatbotState(chatMessage);
+    }
+
+    async sendMessageToAssistantBackend(userMessage) {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      
+      try {
+        const response = await axios.post(`${apiUrl}/chatWithAssistant`, {
+          message: userMessage,
+          threadId: this.threadId,
+          assistantId: this.assistantId
+        });
+        
+        if (response.data && response.data.message) {
+          this.addBotMessage(response.data.message);
+        } else {
+          this.addBotMessage('Sorry, I received an empty response from the server.');
+        }
+      } catch (error) {
+        console.error('Error communicating with assistant backend:', error);
+        this.addBotMessage('Sorry, I encountered an error while processing your message.');
       }
+    }
+    
+    addMessageToChat(message) {
+      const chatMessage = this.createChatBotMessage(message);
+      this.updateChatbotState(chatMessage);
+    }
   
     updateChatbotState(message) {
       this.setState(prevState => ({

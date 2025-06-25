@@ -1,0 +1,46 @@
+steps:
+# New step to create a build_id.txt file for cache busting
+- name: 'bash'
+  id: 'Create Cache Buster File'
+  args: ['-c', 'echo "$BUILD_ID" > build_id.txt']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Docker Build Unstaged'
+  args: ['build', '-t', 'xavibot-app-image-unstaged:latest', '.']
+  waitFor: ['Create Cache Buster File']
+
+- name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
+  id: 'Docker Login with Access Token to Regional Endpoint'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    set -x
+    set -e
+    echo "INFO: Build running as: $(gcloud config get-value account)"
+    echo "INFO: Attempting Docker login to us-central1-docker.pkg.dev using an access token..."
+    token_for_docker_login=$(gcloud auth print-access-token)
+    if [ -z "$token_for_docker_login" ]; then
+      echo "ERROR: Failed to retrieve access token."
+      exit 1
+    fi
+    echo "$token_for_docker_login" | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
+    echo "INFO: Docker login command executed for regional endpoint."
+  waitFor: ['Docker Build Unstaged']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Docker Tag and Push to Regional Endpoint'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    set -x
+    set -e
+    echo "INFO: Tagging image xavibot-app-image-unstaged:latest to us-central1-docker.pkg.dev/xavibot-personal/xavibot/app-image:latest"
+    docker tag xavibot-app-image-unstaged:latest us-central1-docker.pkg.dev/xavibot-personal/xavibot/app-image:latest
+    echo "INFO: Pushing us-central1-docker.pkg.dev/xavibot-personal/xavibot/app-image:latest"
+    docker push us-central1-docker.pkg.dev/xavibot-personal/xavibot/app-image:latest
+  waitFor: ['Docker Login with Access Token to Regional Endpoint']
+
+images:
+- 'us-central1-docker.pkg.dev/xavibot-personal/xavibot/app-image:latest'
