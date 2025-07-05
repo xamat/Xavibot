@@ -1,48 +1,187 @@
-# Fullstack chatbot 
-This project was bootstrapped with [React Chatbot kit](https://fredrikoseberg.github.io/react-chatbot-kit-docs/docs/getting-started/) on the frontend.
+# Xavibot - AI Chatbot with Gemini Backend
 
-The backend is developedin Node.js and uses [OpenAI's Assistant API](https://platform.openai.com/docs/assistants/overview).
+This project is a fullstack chatbot that can impersonate Xavi Amatriain using Google's Gemini AI. It features a React frontend with a Node.js backend that supports both OpenAI and Google Gemini backends with automatic switching.
+
+## Features
+
+- **Dual Backend Support**: Switch between OpenAI GPT and Google Gemini
+- **Xavi Amatriain Impersonation**: AI responds as if it were Xavi Amatriain
+- **Knowledge Base Integration**: Uses PDF documents about Xavi's work and background
+- **File API Support**: Uploads PDF files to Gemini File API for native document processing
+- **Conversation History**: Maintains context across chat sessions
+- **Backend Switching**: Easy configuration to switch between AI providers
+
+## Architecture
+
+### Frontend
+- Built with [React Chatbot Kit](https://fredrikoseberg.github.io/react-chatbot-kit-docs/docs/getting-started/)
+- Modern UI with customizable styling
+- Real-time chat interface
+
+### Backend
+- **Primary**: Google Gemini with File API support
+- **Fallback**: OpenAI GPT (optional)
+- **Backend Switcher**: Automatic routing between AI providers
+- **File Upload**: Native PDF processing with Gemini File API
+
+## Quick Start
+
+### Prerequisites
+- Node.js (v18 or higher)
+- Google Gemini API key
+- (Optional) OpenAI API key
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/xamat/Xavibot.git
+cd Xavibot
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables in `.env`:
+```bash
+# API Configuration
+REACT_APP_API_URL=http://localhost:8080
+BACKEND_TYPE=gemini
+
+# Gemini Configuration
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
+
+# Server Configuration
+PORT=8080
+CORS_ORIGIN=*
+
+# Optional: OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+4. Start the backend:
+```bash
+cd src/server && node index.js
+```
+
+5. Start the frontend (in a new terminal):
+```bash
+npm run start-frontend
+```
+
+6. Open [http://localhost:8081/Xavibot](http://localhost:8081/Xavibot) in your browser
 
 ## Available Scripts
 
-In the project directory, you can run:
+### Development
+- `npm run start-frontend` - Launches the React frontend on port 8081
+- `npm run dev-server` - Launches the server using nodemon for development
+- `npm run dev` - Launches both frontend and backend concurrently
+- `npm run dev-gemini` - Launches with Gemini backend
+- `npm run dev-openai` - Launches with OpenAI backend
 
-### `npm start`or  `npm start-server`
+### Production
+- `npm run build` - Builds the React frontend for production
+- `npm run deploy` - Builds and deploys to GitHub Pages
 
-Runs the server.
-Open [http://localhost:3001](http://localhost:3001) to view the different endpoints.
-Note that the actual URL for the server should be defined in the REACT_APP_API_URL of your .env file.
+### Testing
+- `npm run test-backends` - Tests backend switching functionality
 
-### `npm start-frontend`
+## Configuration
 
-Launches the React frontend. Open [http://localhost:3000](http://localhost:3000)
+### Backend Switching
 
-### `npm dev-server`
+The system automatically switches between backends based on the `BACKEND_TYPE` environment variable:
 
-Launches the server using nodemon so that it will restart whenever you change code while developing.
+- `BACKEND_TYPE=gemini` - Uses Google Gemini (default)
+- `BACKEND_TYPE=openai` - Uses OpenAI GPT
 
-### `npm dev`
+### Knowledge Base
 
-Uses concurrently to launch both the server and the frontend.
+The chatbot uses PDF documents stored in `src/server/`:
+- `xamatriain.pdf` - Main knowledge base about Xavi
+- `xamatriain_guide.pdf` - Additional information
+- `blog.pdf` - Blog content
 
-### `npm build`
+These files are automatically uploaded to Gemini File API on startup.
 
-Builds react front-end
+### AI Instructions
 
-### `npm deploy`
+The system uses comprehensive instructions to make the AI impersonate Xavi Amatriain, including:
+- Professional background and expertise
+- Personal communication style
+- Knowledge limitations and honesty
+- Use of provided documents
 
-Builds react front-end and deploys to github. Note that if you use this script you should edit the remote github URL to yours and possibly define GH_TOKEN locally if you are using token based authentication.
+## Deployment
 
-## Environment variables
+### Local Development
+1. Set `REACT_APP_API_URL=http://localhost:8080` in `.env`
+2. Start backend: `cd src/server && node index.js`
+3. Start frontend: `npm run start-frontend`
 
-### OPENAI_API_KEY
+### Production Deployment
+1. Set `REACT_APP_API_URL` to your production backend URL
+2. Build frontend: `npm run build`
+3. Deploy backend to your preferred hosting service
+4. Deploy frontend: `npm run deploy`
 
-You can copy your OpenAI key here directly for local development
+## Environment Variables
 
-### AZURE_CLIENT_ID, AZURE_TENANT_ID, and AZURE_CLIENT_SECRET
+### Required
+- `GEMINI_API_KEY` - Your Google Gemini API key
+- `REACT_APP_API_URL` - Backend server URL
 
-I am using Azure to deploy the server and store the OpenAI key remotely. You might not need this. Make sure to modify the app.js file accordingly.
+### Optional
+- `BACKEND_TYPE` - Set to 'gemini' or 'openai' (default: 'gemini')
+- `GEMINI_MODEL` - Gemini model to use (default: 'gemini-2.5-flash')
+- `OPENAI_API_KEY` - OpenAI API key (if using OpenAI backend)
+- `PORT` - Server port (default: 8080)
+- `CORS_ORIGIN` - CORS origin (default: '*')
 
-### REACT_APP_API_URL
+## Project Structure
 
-Where you want to deploy the server. I recommend http://localhost:3001 for development.
+```
+Xavibot/
+├── src/
+│   ├── server/
+│   │   ├── gemini-backend.js      # Gemini backend implementation
+│   │   ├── openai-backend.js      # OpenAI backend implementation
+│   │   ├── backend-switcher.js    # Backend switching logic
+│   │   ├── config.js              # Configuration and instructions
+│   │   ├── app.js                 # Main Express server
+│   │   └── index.js               # Server entry point
+│   ├── ActionProvider.js          # Frontend action handling
+│   ├── MessageParser.js           # Message parsing logic
+│   └── ChatbotContainer.js        # Main chatbot component
+├── public/                        # Static assets
+├── .env                           # Environment variables
+└── package.json                   # Dependencies and scripts
+```
+
+## Documentation
+
+- [GEMINI_MIGRATION.md](GEMINI_MIGRATION.md) - Migration guide from OpenAI to Gemini
+- [BACKEND_SWITCHING.md](BACKEND_SWITCHING.md) - Backend switching implementation details
+- [KNOWLEDGE_BASE_STRATEGIES.md](KNOWLEDGE_BASE_STRATEGIES.md) - Knowledge base strategies and approaches
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Built with [React Chatbot Kit](https://fredrikoseberg.github.io/react-chatbot-kit-docs/)
+- Powered by [Google Gemini](https://ai.google.dev/) and [OpenAI](https://openai.com/)
+- Knowledge base contains information about Xavi Amatriain's work and background
