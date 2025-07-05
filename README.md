@@ -185,3 +185,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with [React Chatbot Kit](https://fredrikoseberg.github.io/react-chatbot-kit-docs/)
 - Powered by [Google Gemini](https://ai.google.dev/) and [OpenAI](https://openai.com/)
 - Knowledge base contains information about Xavi Amatriain's work and background
+# Updated deployment status
