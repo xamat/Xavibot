@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Google Auth - Identity Services</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <h1>Google Auth Test - Identity Services</h1>
+    <div id="g_id_onload"
+         data-client_id="852440180218-cgdu2ootjb628v30lb5kpp6ckf3juuhk.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin" 
+         data-type="standard" 
+         data-size="large" 
+         data-theme="outline" 
+         data-text="sign_in_with" 
+         data-shape="rectangular" 
+         data-logo_alignment="left">
+    </div>
+    <div id="result"></div>
+
+    <script>
+        function handleCredentialResponse(response) {
+            console.log('Credential response received');
+            console.log('Response:', response);
+            
+            document.getElementById('result').innerHTML = 'Got credential response! Token length: ' + response.credential.length;
+            
+            // First test the health endpoint (no authentication required)
+            fetch('https://xavibot-service-852440180218.us-central1.run.app/health')
+            .then(response => {
+                console.log('Health check status:', response.status);
+                return response.text();
+            })
+            .then(data => {
+                console.log('Health check data:', data);
+                document.getElementById('result').innerHTML += '<br><br>Health check: ' + data;
+                
+                // If health check works, then test the authenticated endpoint
+                return fetch('https://xavibot-service-852440180218.us-central1.run.app/get-assistant', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${response.credential}`
+                    },
+                    body: JSON.stringify({})
+                });
+            })
+            .then(response => {
+                console.log('API Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('API Response data:', data);
+                document.getElementById('result').innerHTML += '<br><br>API Response: ' + JSON.stringify(data);
+            })
+            .catch(error => {
+                console.error('API Error:', error);
+                document.getElementById('result').innerHTML += '<br><br>API Error: ' + error.message;
+            });
+        }
+
+        // Add some debugging
+        window.onload = function() {
+            console.log('Page loaded');
+            if (typeof google !== 'undefined') {
+                console.log('Google Identity Services loaded');
+            } else {
+                console.log('Google Identity Services not loaded yet');
+            }
+        };
+    </script>
+</body>
+</html>
