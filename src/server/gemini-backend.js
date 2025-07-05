@@ -4,6 +4,8 @@ const path = require('path');
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 const config = require('./config');
 
+
+
 class GeminiBackend {
   constructor() {
     this.genAI = null;
@@ -52,13 +54,9 @@ class GeminiBackend {
   }
 
   async setupCachedKnowledgeBase() {
-    // Check if files are already uploaded (cached)
-    if (this.uploadedFiles.length > 0) {
-      console.log(`Using cached knowledge base: ${this.uploadedFiles.length} files already uploaded`);
-      return;
-    }
-
     console.log('Setting up cached knowledge base...');
+    
+    // Always upload files during initialization to ensure they're ready
     this.uploadedFiles = [];
 
     // Upload PDF files using the correct API signature
@@ -90,7 +88,7 @@ class GeminiBackend {
       }
     }
 
-    console.log(`Setup complete: ${this.uploadedFiles.length} files uploaded`);
+    console.log(`Setup complete: ${this.uploadedFiles.length} files uploaded and cached`);
   }
 
   async getAssistant() {
@@ -123,6 +121,8 @@ class GeminiBackend {
 
       // If this is the first message in the thread, use uploaded files if available
       if (history.length === 0 && this.uploadedFiles.length > 0) {
+        console.log(`Using ${this.uploadedFiles.length} cached files for first message`);
+        
         // Create content with uploaded files using the correct API
         const fileParts = this.uploadedFiles.map(file => ({
           fileData: {
