@@ -14,6 +14,11 @@ function ChatbotContainer() {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
 
+        // Pre-warm the backend to reduce first message latency
+        console.log('Pre-warming backend...');
+        await axios.get(`${apiUrl}/prewarm`);
+        console.log('Backend pre-warmed successfully');
+
         // Create Assistant and store its ID
         const assistantResponse = await axios.post(`${apiUrl}/get-assistant`);
         globalState.setAssistantId(assistantResponse.data);

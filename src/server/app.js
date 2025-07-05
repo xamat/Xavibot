@@ -114,8 +114,50 @@ app.post('/create-thread', async (req, res) => {
   }
 });
 
-app.get('/health', (req, res) => {
-  res.status(200).send('Server is up and running');
+app.get('/health', async (req, res) => {
+  try {
+    // Ensure backend is initialized
+    if (!backend) {
+      await initializeApp();
+    }
+    res.status(200).json({ 
+      status: 'Server is up and running',
+      backend: backendSwitcher ? backendSwitcher.getBackendType() : 'not initialized',
+      initialized: !!backend
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(500).json({ 
+      status: 'Server error',
+      error: error.message 
+    });
+  }
+});
+
+app.get('/prewarm', async (req, res) => {
+  try {
+    // Ensure backend is fully initialized and warmed up
+    if (!backend) {
+      await initializeApp();
+    }
+    
+    // Pre-warm by creating a test assistant and thread
+    const assistantId = await backend.getAssistant();
+    const threadId = await backend.createThread();
+    
+    res.status(200).json({ 
+      status: 'Backend pre-warmed successfully',
+      assistantId,
+      threadId,
+      backend: backendSwitcher ? backendSwitcher.getBackendType() : 'unknown'
+    });
+  } catch (error) {
+    console.error('Pre-warm failed:', error);
+    res.status(500).json({ 
+      status: 'Pre-warm failed',
+      error: error.message 
+    });
+  }
 });
 
 app.post('/chat', async (req, res) => {

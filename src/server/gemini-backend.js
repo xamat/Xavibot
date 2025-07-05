@@ -52,6 +52,12 @@ class GeminiBackend {
   }
 
   async setupCachedKnowledgeBase() {
+    // Check if files are already uploaded (cached)
+    if (this.uploadedFiles.length > 0) {
+      console.log(`Using cached knowledge base: ${this.uploadedFiles.length} files already uploaded`);
+      return;
+    }
+
     console.log('Setting up cached knowledge base...');
     this.uploadedFiles = [];
 
