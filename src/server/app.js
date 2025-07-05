@@ -74,6 +74,10 @@ initializeApp().catch(error => {
 
 app.post('/get-assistant', async (req, res) => {
   try {
+    // Wait for backend to be initialized
+    if (!backend) {
+      await initializeApp();
+    }
     const assistantId = await backend.getAssistant();
     res.json(assistantId);
   } catch (error) {
@@ -84,6 +88,10 @@ app.post('/get-assistant', async (req, res) => {
 
 app.post('/create-assistant', async (req, res) => {
   try {
+    // Wait for backend to be initialized
+    if (!backend) {
+      await initializeApp();
+    }
     const assistantId = await backend.createAssistant();
     res.json(assistantId);
   } catch (error) {
@@ -94,6 +102,10 @@ app.post('/create-assistant', async (req, res) => {
 
 app.post('/create-thread', async (req, res) => {
   try {
+    // Wait for backend to be initialized
+    if (!backend) {
+      await initializeApp();
+    }
     const threadId = await backend.createThread();
     res.json(threadId);
   } catch (error) {
@@ -148,6 +160,10 @@ app.post('/chatWithAssistant', async (req, res) => {
   const threadId = req.body.threadId;
   
   try {
+    // Wait for backend to be initialized
+    if (!backend) {
+      await initializeApp();
+    }
     const result = await backend.chatWithAssistant(userMessage, threadId);
     res.json(result);
   } catch (error) {
