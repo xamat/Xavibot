@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "49bbd1f32aab5776c7e137d1de03bb36",
+    "revision": "afed77c36712233b4d900c07fd922bc1",
     "url": "/Xavibot/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Xavibot/static/css/2.3f602dff.chunk.css"
   },
   {
-    "revision": "4902b0c55005f5e2f126",
+    "revision": "87a77d23217d15c54c6f",
     "url": "/Xavibot/static/css/main.435d5fe5.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Xavibot/static/js/2.47e229b1.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "4902b0c55005f5e2f126",
-    "url": "/Xavibot/static/js/main.b6a8ab22.chunk.js"
+    "revision": "87a77d23217d15c54c6f",
+    "url": "/Xavibot/static/js/main.85820fce.chunk.js"
   },
   {
     "revision": "73a8e80d31b15fea4429",

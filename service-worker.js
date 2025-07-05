@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/Xavibot/precache-manifest.365211e5b50c22327cad2382e7f0def8.js"
+  "/Xavibot/precache-manifest.666154b77bb38fa23ff8409f36620054.js"
 );
 
 self.addEventListener('message', (event) => {
