@@ -34,7 +34,7 @@
     "start-frontend": "NODE_OPTIONS='--openssl-legacy-provider' react-scripts start",
     "dev-server": "nodemon src/server/app.js",
     "test-backends": "node src/server/test-backend-switching.js",
-    "predeploy": "npm run build",
+    "predeploy": "NODE_OPTIONS='--openssl-legacy-provider' npm run build",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
