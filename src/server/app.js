@@ -26,6 +26,38 @@ app.use((req, res, next) => {
   }
 });
 
+app.post('/switch-backend', async (req, res) => {
+  const { backendType } = req.body;
+  if (!backendType || (backendType !== 'openai' && backendType !== 'gemini')) {
+    return res.status(400).json({ message: 'Invalid backend type specified. Use "openai" or "gemini".' });
+  }
+
+  try {
+    if (!backendSwitcher) {
+      // This should ideally not happen if initializeApp was called at startup
+      console.error('BackendSwitcher not initialized during switch attempt.');
+      await initializeApp();
+    }
+
+    console.log(`Attempting to switch backend to: ${backendType}`);
+    backend = await backendSwitcher.switchBackend(backendType);
+    // No need to call initializeApp() again here, switchBackend handles re-initialization.
+
+    console.log(`Backend switched successfully to: ${backendSwitcher.getBackendType()}`);
+    res.json({ message: `Successfully switched to ${backendType} backend.` });
+  } catch (error) {
+    console.error(`Error switching backend to ${backendType}:`, error);
+    // Try to revert to the previous backend or a default if possible
+    // For now, just log the error and inform the client.
+    // A more robust solution might try to re-initialize to the original backend.
+    let currentBackend = 'unknown';
+    if (backendSwitcher) {
+        currentBackend = backendSwitcher.getBackendType();
+    }
+    res.status(500).json({ message: `Failed to switch to ${backendType} backend. Current backend: ${currentBackend}. Error: ${error.message}` });
+  }
+});
+
 //TODO: In a production environment, you might want to restrict which origins are allowed to access your API for security reasons.
 
 // Initialize the application
@@ -132,7 +164,14 @@ app.post('/chatWithAssistant', async (req, res) => {
   try {
     // Wait for backend to be initialized
     if (!backend) {
+      // This is a fallback, initializeApp should run at server start
+      // and after each successful backend switch.
+      console.warn('Backend not initialized at chatWithAssistant call. Attempting to initialize.');
       await initializeApp();
+      if (!backend) {
+        // If still not initialized, something is seriously wrong.
+        throw new Error("Backend could not be initialized for chat.");
+      }
     }
     const result = await backend.chatWithAssistant(userMessage, threadId);
     res.json(result);

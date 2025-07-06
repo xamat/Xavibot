@@ -41,6 +41,17 @@ class ActionProvider {
       this.updateChatbotState(helpMessage);
     }
   
+    async handleBackendSwitch(backendType) {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      try {
+        const response = await axios.post(`${apiUrl}/switch-backend`, { backendType });
+        this.addBotMessage(response.data.message);
+      } catch (error) {
+        console.error('Error switching backend:', error);
+        this.addBotMessage('Sorry, I encountered an error while switching the backend.');
+      }
+    }
+
     handleUnknown() {
       const unknownMessage = this.createChatBotMessage("Sorry, I didn't understand that.");
       this.updateChatbotState(unknownMessage);
