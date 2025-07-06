@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Xavibot/static/css/main.435d5fe5.chunk.css",
-    "main.js": "/Xavibot/static/js/main.c9af5525.chunk.js",
-    "main.js.map": "/Xavibot/static/js/main.c9af5525.chunk.js.map",
+    "main.js": "/Xavibot/static/js/main.225ea825.chunk.js",
+    "main.js.map": "/Xavibot/static/js/main.225ea825.chunk.js.map",
     "runtime-main.js": "/Xavibot/static/js/runtime-main.b1cf2377.js",
     "runtime-main.js.map": "/Xavibot/static/js/runtime-main.b1cf2377.js.map",
     "static/css/2.3f602dff.chunk.css": "/Xavibot/static/css/2.3f602dff.chunk.css",
     "static/js/2.47e229b1.chunk.js": "/Xavibot/static/js/2.47e229b1.chunk.js",
     "static/js/2.47e229b1.chunk.js.map": "/Xavibot/static/js/2.47e229b1.chunk.js.map",
     "index.html": "/Xavibot/index.html",
-    "precache-manifest.57b3914aaf5e1450ed332a5bb13a9fbd.js": "/Xavibot/precache-manifest.57b3914aaf5e1450ed332a5bb13a9fbd.js",
+    "precache-manifest.c3098c03aa2909b53cb56c3c58620cfa.js": "/Xavibot/precache-manifest.c3098c03aa2909b53cb56c3c58620cfa.js",
     "service-worker.js": "/Xavibot/service-worker.js",
     "static/css/2.3f602dff.chunk.css.map": "/Xavibot/static/css/2.3f602dff.chunk.css.map",
     "static/css/main.435d5fe5.chunk.css.map": "/Xavibot/static/css/main.435d5fe5.chunk.css.map",
@@ -20,6 +20,6 @@
     "static/css/2.3f602dff.chunk.css",
     "static/js/2.47e229b1.chunk.js",
     "static/css/main.435d5fe5.chunk.css",
-    "static/js/main.c9af5525.chunk.js"
+    "static/js/main.225ea825.chunk.js"
   ]
 }
