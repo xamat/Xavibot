@@ -5,6 +5,7 @@ This project is a fullstack chatbot that can impersonate Xavi Amatriain using Go
 ## Features
 
 - **Dual Backend Support**: Switch between OpenAI GPT and Google Gemini
+- **Dynamic Backend Switching**: Switch between backends during runtime via the chat interface
 - **Xavi Amatriain Impersonation**: AI responds as if it were Xavi Amatriain
 - **Knowledge Base Integration**: Uses PDF documents about Xavi's work and background
 - **File API Support**: Uploads PDF files to Gemini File API for native document processing
@@ -94,10 +95,22 @@ npm run start-frontend
 
 ### Backend Switching
 
+The system supports two types of backend switching:
+
+#### 1. Configuration-based Switching
 The system automatically switches between backends based on the `BACKEND_TYPE` environment variable:
 
 - `BACKEND_TYPE=gemini` - Uses Google Gemini (default)
 - `BACKEND_TYPE=openai` - Uses OpenAI GPT
+
+#### 2. Runtime Backend Switching
+You can switch between backends during a conversation by typing specific commands:
+
+- Type `/useGemini` or `/useOpenAI` to change backends
+- The system will automatically create a new thread for the new backend
+- Your conversation history will be preserved within each backend
+
+**Note**: When switching backends, you'll get a new conversation thread, so previous messages won't be available in the new backend. Gemini is used by default.
 
 ### Knowledge Base
 

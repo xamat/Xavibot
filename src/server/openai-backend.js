@@ -1,10 +1,13 @@
 const OpenAI = require('openai');
+const fs = require('fs');
+const path = require('path');
 const config = require('./config');
 
 class OpenAIBackend {
   constructor() {
     this.openai = null;
     this.assistant = null;
+    this.uploadedFiles = []; // Store uploaded file references
     this.conversationHistory = new Map(); // threadId -> conversation history
   }
 
@@ -21,46 +24,37 @@ class OpenAIBackend {
       apiKey: process.env.OPENAI_API_KEY
     });
 
-    // Create or get assistant
-    await this.createAssistant();
+    // Get existing assistant (no file upload needed)
+    await this.getExistingAssistant();
 
     console.log('OpenAI backend initialized successfully');
   }
 
-  async createAssistant() {
+  // File upload methods removed - using existing assistant with pre-uploaded files
+
+  async getExistingAssistant() {
     try {
-      // Check if assistant already exists
+      // Get the existing assistant by name
       const assistants = await this.openai.beta.assistants.list();
-      const existingAssistant = assistants.data.find(a => a.name === 'Xavi Amatriain Assistant');
+      const existingAssistant = assistants.data.find(a => a.name === config.OPENAI.ASSISTANT_NAME);
       
       if (existingAssistant) {
         this.assistant = existingAssistant;
         console.log('Using existing assistant:', this.assistant.id);
       } else {
-        // Create new assistant
-        this.assistant = await this.openai.beta.assistants.create({
-          name: 'Xavi Amatriain Assistant',
-          instructions: config.OPENAI.INSTRUCTIONS,
-          model: config.OPENAI.MODEL,
-          tools: [{ type: 'retrieval' }]
-        });
-        console.log('Created new assistant:', this.assistant.id);
+        throw new Error(`Assistant with name '${config.OPENAI.ASSISTANT_NAME}' not found. Please create it in your OpenAI account first.`);
       }
     } catch (error) {
-      console.error('Error creating assistant:', error);
+      console.error('Error getting existing assistant:', error);
       throw error;
     }
   }
 
   async getAssistant() {
     if (!this.assistant) {
-      await this.createAssistant();
+      await this.getExistingAssistant();
     }
     return this.assistant.id;
-  }
-
-  async createAssistant() {
-    return this.getAssistant();
   }
 
   async createThread() {
@@ -88,10 +82,13 @@ class OpenAIBackend {
       });
 
       // Wait for completion
-      let runStatus = await this.openai.beta.threads.runs.retrieve(threadId, run.id);
+      let runs = await this.openai.beta.threads.runs.list(threadId);
+      let runStatus = runs.data.find(r => r.id === run.id);
+      
       while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        runStatus = await this.openai.beta.threads.runs.retrieve(threadId, run.id);
+        runs = await this.openai.beta.threads.runs.list(threadId);
+        runStatus = runs.data.find(r => r.id === run.id);
       }
 
       if (runStatus.status === 'failed') {

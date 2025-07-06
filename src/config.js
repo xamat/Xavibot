@@ -14,6 +14,7 @@
         <a href="https://notebooklm.google.com/notebook/56e35827-04fd-4f93-8f7d-9eaab9bf3852?_gl=1*1ojl3rl*_ga*ODMwNTc0ODMuMTc0OTI3OTM0Mg..*_ga_W0LDH41ZCB*czE3NDkyNzkzNDIkbzEkZzAkdDE3NDkyNzkzNDIkajYwJGwwJGgw&pli=1"
         target="_blank" rel="noopener noreferrer">NotebookLM notebook</a>
         </p>
+        <p><strong>Backend Switching:</strong> You can switch between AI backends during our conversation by typing "/useOpenAI" or "/useGemini". We use Gemini by default.</p>
         All that being said, how can I help you today, human? `
          }}>
       </div>

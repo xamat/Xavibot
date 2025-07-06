@@ -39,12 +39,20 @@ app.post('/switch-backend', async (req, res) => {
       await initializeApp();
     }
 
-    console.log(`Attempting to switch backend to: ${backendType}`);
     backend = await backendSwitcher.switchBackend(backendType);
     // No need to call initializeApp() again here, switchBackend handles re-initialization.
 
-    console.log(`Backend switched successfully to: ${backendSwitcher.getBackendType()}`);
-    res.json({ message: `Successfully switched to ${backendType} backend.` });
+    // Create a new thread for the new backend
+    const newThreadId = await backend.createThread();
+    
+    // Get the assistant ID for the new backend
+    const assistantId = await backend.getAssistant();
+    
+    res.json({ 
+      message: `Successfully switched to ${backendType} backend.`,
+      threadId: newThreadId,
+      assistantId: assistantId
+    });
   } catch (error) {
     console.error(`Error switching backend to ${backendType}:`, error);
     // Try to revert to the previous backend or a default if possible
