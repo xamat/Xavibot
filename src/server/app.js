@@ -13,7 +13,8 @@ app.use(express.json());
 
 // CORS configuration
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const allowedOrigin = config.SERVER.CORS_ORIGIN;
+  res.header('Access-Control-Allow-Origin', allowedOrigin);
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-api-key');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -26,7 +27,25 @@ app.use((req, res, next) => {
   }
 });
 
-app.post('/switch-backend', async (req, res) => {
+// Authentication middleware
+const authenticateAPI = (req, res, next) => {
+  const apiKey = req.header('x-api-key');
+  const configuredKey = config.SERVER.API_KEY;
+
+  // If no key is configured in the environment, we skip check (for development)
+  // but warn about it.
+  if (!configuredKey) {
+    console.warn('WARNING: No XAVIBOT_API_KEY configured. API is public.');
+    return next();
+  }
+
+  if (apiKey !== configuredKey) {
+    return res.status(401).json({ message: 'Unauthorized: Invalid or missing API key.' });
+  }
+  next();
+};
+
+app.post('/switch-backend', authenticateAPI, async (req, res) => {
   const { backendType } = req.body;
   if (!backendType || (backendType !== 'openai' && backendType !== 'gemini')) {
     return res.status(400).json({ message: 'Invalid backend type specified. Use "openai" or "gemini".' });
@@ -87,7 +106,7 @@ initializeApp().catch(error => {
     process.exit(1);
 });
 
-app.post('/get-assistant', async (req, res) => {
+app.post('/get-assistant', authenticateAPI, async (req, res) => {
   try {
     // Wait for backend to be initialized
     if (!backend) {
@@ -103,7 +122,7 @@ app.post('/get-assistant', async (req, res) => {
 
 
 
-app.post('/create-thread', async (req, res) => {
+app.post('/create-thread', authenticateAPI, async (req, res) => {
   try {
     // Wait for backend to be initialized
     if (!backend) {
@@ -125,19 +144,17 @@ app.get('/health', async (req, res) => {
     }
     res.status(200).json({ 
       status: 'Server is up and running',
-      backend: backendSwitcher ? backendSwitcher.getBackendType() : 'not initialized',
-      initialized: !!backend
+      backend: backendSwitcher ? backendSwitcher.getBackendType() : 'not initialized'
     });
   } catch (error) {
     console.error('Health check failed:', error);
     res.status(500).json({ 
-      status: 'Server error',
-      error: error.message 
+      status: 'Server error'
     });
   }
 });
 
-app.get('/prewarm', async (req, res) => {
+app.get('/prewarm', authenticateAPI, async (req, res) => {
   try {
     // Ensure backend is fully initialized and warmed up
     if (!backend) {
@@ -150,22 +167,19 @@ app.get('/prewarm', async (req, res) => {
     
     res.status(200).json({ 
       status: 'Backend pre-warmed successfully',
-      assistantId,
-      threadId,
       backend: backendSwitcher ? backendSwitcher.getBackendType() : 'unknown'
     });
   } catch (error) {
     console.error('Pre-warm failed:', error);
     res.status(500).json({ 
-      status: 'Pre-warm failed',
-      error: error.message 
+      status: 'Pre-warm failed'
     });
   }
 });
 
 
 
-app.post('/chatWithAssistant', async (req, res) => {
+app.post('/chatWithAssistant', authenticateAPI, async (req, res) => {
   const userMessage = req.body.message;
   const threadId = req.body.threadId;
   
