@@ -25,7 +25,10 @@
     "serialize-javascript": "^7.0.4"
   },
   "overrides": {
-    "serialize-javascript": "^7.0.4"
+    "serialize-javascript": "^7.0.4",
+    "nth-check": "^2.0.1",
+    "underscore": "^1.13.7",
+    "postcss": "^8.4.31"
   },
   "scripts": {
     "start": "react-scripts start",
