@@ -1,10 +1,11 @@
 // globalState.js
 const globalState = {
-    threadId: null,
-    assistantId: null,
-    setThreadId: function(id) { this.threadId = id; },
-    setAssistantId: function(id) { this.assistantId = id; }
-  };
-  
-  export default globalState;
-  
+  threadId: null,
+  assistantId: null,
+  sessionId: null,
+  setThreadId(id) { this.threadId = id; },
+  setAssistantId(id) { this.assistantId = id; },
+  setSessionId(id) { this.sessionId = id; }
+};
+
+export default globalState;

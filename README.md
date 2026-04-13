@@ -148,6 +148,10 @@ The system uses comprehensive instructions to make the AI impersonate Xavi Amatr
 - `GEMINI_API_KEY` - Your Google Gemini API key
 - `REACT_APP_API_URL` - Backend server URL
 
+### Browser session bootstrap
+- The browser initializes through `/session/init` and receives a server-managed session id.
+- Do not expose `XAVIBOT_API_KEY` or any equivalent secret in frontend build variables.
+
 ### Optional
 - `BACKEND_TYPE` - Set to 'gemini' or 'openai' (default: 'gemini')
 - `GEMINI_MODEL` - Gemini model to use (default: 'gemini-2.5-flash')
