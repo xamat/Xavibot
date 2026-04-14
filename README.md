@@ -137,10 +137,9 @@ The system uses comprehensive instructions to make the AI impersonate Xavi Amatr
 3. Start frontend: `npm run start-frontend`
 
 ### Production Deployment
-1. Set `REACT_APP_API_URL` to your production backend URL
-2. Build frontend: `npm run build`
-3. Deploy backend to your preferred hosting service
-4. Deploy frontend: `npm run deploy`
+See:
+- [DEPLOYMENT.md](DEPLOYMENT.md)
+- [TESTING.md](TESTING.md)
 
 ## Environment Variables
 
@@ -181,6 +180,8 @@ Xavibot/
 
 ## Documentation
 
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Backend/frontend deployment steps
+- [TESTING.md](TESTING.md) - Post-deploy smoke tests and regression checklist
 - [GEMINI_MIGRATION.md](GEMINI_MIGRATION.md) - Migration guide from OpenAI to Gemini
 - [BACKEND_SWITCHING.md](BACKEND_SWITCHING.md) - Backend switching implementation details
 - [KNOWLEDGE_BASE_STRATEGIES.md](KNOWLEDGE_BASE_STRATEGIES.md) - Knowledge base strategies and approaches
