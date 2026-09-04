@@ -16,7 +16,7 @@ class MessageParser {
     } else if (lowerCaseMessage === "/usegemini") {
       this.actionProvider.handleBackendSwitch("gemini");
     } else if (lowerCaseMessage === "/useopenai") {
-      this.actionProvider.handleBackendSwitch("openai");
+      this.actionProvider.addBotMessage("Gemini is the only available backend.");
     } else {
       // Send the message to the assistant backend
       this.actionProvider.sendMessageToAssistantBackend(message);

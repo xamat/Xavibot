@@ -33,14 +33,13 @@ class BackendSwitcher {
       if (backendTypeToInit && this.backendType !== typeToInitialize) {
         console.warn(`Attempting to revert to previous backend: ${this.backendType}`);
         try {
-            await this.initialize(this.backendType); // Re-initialize with the original type
-            console.log(`Successfully reverted to ${this.backendType} backend.`);
-            // Indicate that the switch failed by throwing a new error or returning a specific status
-            throw new Error(`Failed to switch to ${typeToInitialize}, reverted to ${this.backendType}. Original error: ${error.message}`);
+          await this.initialize(this.backendType); // Re-initialize with the original type
+          console.log(`Successfully reverted to ${this.backendType} backend.`);
         } catch (revertError) {
-            console.error(`Failed to revert to ${this.backendType} backend:`, revertError);
-            throw new Error(`Failed to initialize ${typeToInitialize} and also failed to revert. System may be unstable. Original error: ${error.message}, Revert error: ${revertError.message}`);
+          console.error(`Failed to revert to ${this.backendType} backend:`, revertError);
+          throw new Error(`Failed to initialize ${typeToInitialize} and also failed to revert. System may be unstable. Original error: ${error.message}, Revert error: ${revertError.message}`);
         }
+        throw new Error(`Failed to switch to ${typeToInitialize}, reverted to ${this.backendType}. Original error: ${error.message}`);
       }
       throw error; // Re-throw original error if not a switch or if revert fails
     }
