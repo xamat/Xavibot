@@ -7,7 +7,7 @@ const PORT = process.env.PORT || config.SERVER.PORT;
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server started on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Backend type: ${process.env.BACKEND_TYPE || 'openai'}`);
+  console.log(`Backend type: ${config.BACKEND_TYPE}`);
 });
 
 // Add error handling for the server
