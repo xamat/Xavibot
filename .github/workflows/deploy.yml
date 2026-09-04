@@ -2,52 +2,64 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: CI=true npm test -- --watchAll=false
+
+      - name: Build
+        run: NODE_OPTIONS='--openssl-legacy-provider' npm run build
+        env:
+          REACT_APP_API_URL: https://xavibot-backend-852440180218.us-central1.run.app
+
+      - name: Setup Pages
+        if: github.event_name == 'push'
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './build'
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build
-      run: NODE_OPTIONS='--openssl-legacy-provider' npm run build
-      env:
-        REACT_APP_API_URL: https://xavibot-backend-852440180218.us-central1.run.app
-      
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: './build'
-        
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4 
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
