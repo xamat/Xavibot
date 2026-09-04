@@ -27,4 +27,13 @@ describe('backend selection configuration', () => {
 
     expect(config.BACKEND_TYPE).toBe('openai');
   });
+
+  test('uses a bounded OpenAI request timeout by default', () => {
+    delete process.env.OPENAI_REQUEST_TIMEOUT_MS;
+    jest.resetModules();
+
+    const config = require('./config');
+
+    expect(config.OPENAI.REQUEST_TIMEOUT_MS).toBe(30000);
+  });
 });

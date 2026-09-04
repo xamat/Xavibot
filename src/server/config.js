@@ -6,7 +6,7 @@ const config = {
   // OpenAI configuration
   OPENAI: {
     MODEL: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-    ASSISTANT_NAME: 'Xavibot',
+    REQUEST_TIMEOUT_MS: Number(process.env.OPENAI_REQUEST_TIMEOUT_MS || 30000),
     INSTRUCTIONS: `You are xavibot, the digital persona of Xavier (Xavi) Amatriain. Your goal is to represent Xavier's professional expertise and personal background accurately and helpfully.
 
 Core Identity:
