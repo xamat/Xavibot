@@ -104,13 +104,7 @@ The system automatically switches between backends based on the `BACKEND_TYPE` e
 - `BACKEND_TYPE=openai` - Uses OpenAI GPT
 
 #### 2. Runtime Backend Switching
-You can switch between backends during a conversation by typing specific commands:
-
-- Type `/useGemini` or `/useOpenAI` to change backends
-- The system will automatically create a new thread for the new backend
-- Your conversation history will be preserved within each backend
-
-**Note**: When switching backends, you'll get a new conversation thread, so previous messages won't be available in the new backend. Gemini is used by default.
+The server supports runtime backend switching and creates a fresh provider conversation on each switch. The public frontend currently keeps OpenAI selection hidden pending a separate parity and live-validation rollout, so `/useOpenAI` is intentionally unavailable in the UI. Gemini remains the default.
 
 ### Knowledge Base
 
@@ -119,7 +113,7 @@ The chatbot uses PDF documents stored in `src/server/`:
 - `xamatriain_guide.pdf` - Additional information
 - `blog.pdf` - Blog content
 
-These files are automatically uploaded to Gemini File API on startup.
+These files are automatically uploaded to Gemini File API on startup. The OpenAI Responses backend uses `file_search` with a pre-provisioned vector store containing equivalent copies; it refuses to initialize without `OPENAI_VECTOR_STORE_ID` so knowledge-base behavior is not silently lost.
 
 ### AI Instructions
 
@@ -155,6 +149,8 @@ See:
 - `BACKEND_TYPE` - Set to 'gemini' or 'openai' (default: 'gemini')
 - `GEMINI_MODEL` - Gemini model to use (default: 'gemini-2.5-flash')
 - `OPENAI_API_KEY` - OpenAI API key (if using OpenAI backend)
+- `OPENAI_VECTOR_STORE_ID` - Required with OpenAI; populated vector store for file search
+- `OPENAI_REQUEST_TIMEOUT_MS` - OpenAI SDK timeout (default: 30000)
 - `PORT` - Server port (default: 8080)
 - `CORS_ORIGIN` - CORS origin (default: '*')
 
