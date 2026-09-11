@@ -1,31 +1,53 @@
 # Regression Test Checklist
 
-## Quick smoke test after deploy
+## Automated, non-billable checks
 
-Open:
-- `https://amatria.in/Xavibot/`
+Provider SDK calls are mocked by the test suite.
 
-Verify:
-1. Page loads
-2. App does not stay on `Initializing chatbot...`
-3. Initial chatbot UI appears
-4. Sending `hello` works
-5. Sending a normal question works
-6. `/useGemini` works
-7. `/useOpenAI` reports that Gemini is the only available backend
-8. Another normal question works after the rejected switch command
+```bash
+CI=true npm test -- --runInBand --watchAll=false
+npm run build
+```
+
+Coverage includes:
+
+- Gemini default for every new browser session
+- concurrent sessions on different providers
+- invalid-provider rejection
+- failed OpenAI initialization retaining Gemini state
+- provider and conversation isolation
+- structured provider API responses
+- selector rendering, success, and failure behavior
+
+## Authorized post-deploy smoke test
+
+Do not run these checks as part of routine development: normal questions can call billable provider APIs. Run only after deployment is explicitly authorized.
+
+Open `https://amatria.in/Xavibot/` and verify:
+
+1. The app leaves `Initializing chatbot...` and shows Gemini selected.
+2. A Gemini question succeeds.
+3. Selecting OpenAI updates only that browser session and creates a fresh conversation.
+4. A separate browser session remains on Gemini.
+5. Selecting Gemini again creates a fresh Gemini conversation.
+6. `/useGemini` and `/useOpenAI` direct the visitor to the visible selector.
 
 ## Browser network checks
 
-In DevTools, inspect:
+Inspect:
+
 - `POST /session/init`
+- `GET /session/state`
+- `POST /session/provider`
 - `POST /chatWithAssistant`
-- `POST /switch-backend`
 
 Expected:
-- HTTP 200 responses
-- no 401 for browser traffic
-- no missing route / 404 on `/session/init`
+
+- session init returns `provider: "gemini"`
+- provider selection returns explicit provider and conversation state
+- invalid providers return `400`
+- unavailable providers return a generic `503` while retaining the current provider
+- missing or instance-unknown sessions return `401` and never fall back to a process default
 
 ## Frontend build check
 
@@ -34,7 +56,7 @@ npm ci
 REACT_APP_API_URL=https://xavibot-backend-852440180218.us-central1.run.app npm run build
 ```
 
-## Backend check
+## Non-billable backend health check
 
 ```bash
 curl https://xavibot-backend-852440180218.us-central1.run.app/health
@@ -44,11 +66,9 @@ curl https://xavibot-backend-852440180218.us-central1.run.app/health
 
 - Stuck on `Initializing chatbot...`
   - check `/session/init`
-  - likely backend not redeployed or CORS issue
-
+  - likely backend not deployed or CORS issue
+- Browser gets `401` from session routes
+  - the session may have expired or the request may have reached another Cloud Run instance
+  - requests fail closed; multi-instance continuity needs shared state or configured affinity
 - GitHub Pages build fails with `crypto is not defined`
-  - check workflow Node version
-  - should be `22`
-
-- Browser gets 401 from chat routes
-  - browser should use server session id flow, not `x-api-key`
+  - check workflow Node version; it should be `22`

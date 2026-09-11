@@ -49,7 +49,6 @@ npm install
 ```bash
 # API Configuration
 REACT_APP_API_URL=http://localhost:8080
-BACKEND_TYPE=gemini
 
 # Gemini Configuration
 GEMINI_API_KEY=your_gemini_api_key_here
@@ -81,30 +80,14 @@ npm run start-frontend
 - `npm run start-frontend` - Launches the React frontend on port 8081
 - `npm run dev-server` - Launches the server using nodemon for development
 - `npm run dev` - Launches both frontend and backend concurrently
-- `npm run dev-gemini` - Launches with Gemini backend
-- `npm run dev-openai` - Launches with OpenAI backend
 
 ### Production
 - `npm run build` - Builds the React frontend for production
 - `npm run deploy` - Builds and deploys to GitHub Pages
 
-### Testing
-- `npm run test-backends` - Tests backend switching functionality
+### Session provider selection
 
-## Configuration
-
-### Backend Switching
-
-The system supports two types of backend switching:
-
-#### 1. Configuration-based Switching
-The system automatically switches between backends based on the `BACKEND_TYPE` environment variable:
-
-- `BACKEND_TYPE=gemini` - Uses Google Gemini (default)
-- `BACKEND_TYPE=openai` - Uses OpenAI GPT
-
-#### 2. Runtime Backend Switching
-The server supports runtime backend switching and creates a fresh provider conversation on each switch. The public frontend currently keeps OpenAI selection hidden pending a separate parity and live-validation rollout, so `/useOpenAI` is intentionally unavailable in the UI. Gemini remains the default.
+Every browser session starts on Gemini. After initialization, the visible provider selector can move only that session to OpenAI. The server stores the provider and conversation id together per session; changing one visitor never changes another visitor or a process-wide default. See [BACKEND_SWITCHING.md](BACKEND_SWITCHING.md) for API and multi-instance boundaries.
 
 ### Knowledge Base
 
@@ -146,7 +129,6 @@ See:
 - Do not expose `XAVIBOT_API_KEY` or any equivalent secret in frontend build variables.
 
 ### Optional
-- `BACKEND_TYPE` - Set to 'gemini' or 'openai' (default: 'gemini')
 - `GEMINI_MODEL` - Gemini model to use (default: 'gemini-2.5-flash')
 - `OPENAI_API_KEY` - OpenAI API key (if using OpenAI backend)
 - `OPENAI_VECTOR_STORE_ID` - Required with OpenAI; populated vector store for file search
@@ -162,8 +144,8 @@ Xavibot/
 │   ├── server/
 │   │   ├── gemini-backend.js      # Gemini backend implementation
 │   │   ├── openai-backend.js      # OpenAI backend implementation
-│   │   ├── backend-switcher.js    # Backend switching logic
-│   │   ├── config.js              # Configuration and instructions
+│   │   ├── session-provider.js    # Per-session provider and conversation state
+│   │   ├── create-app.js          # Express routes and middleware
 │   │   ├── app.js                 # Main Express server
 │   │   └── index.js               # Server entry point
 │   ├── ActionProvider.js          # Frontend action handling

@@ -28,6 +28,35 @@
   color: #61dafb;
 }
 
+.provider-selector {
+  align-items: center;
+  background: #fff;
+  border-radius: 8px 8px 0 0;
+  color: #263238;
+  display: flex;
+  font-size: 0.9rem;
+  gap: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  width: 275px;
+}
+
+.provider-selector label {
+  font-weight: 600;
+}
+
+.provider-selector select {
+  border: 1px solid #78909c;
+  border-radius: 4px;
+  color: #263238;
+  padding: 0.25rem;
+}
+
+.provider-status {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  min-height: 1.8em;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

@@ -1,7 +1,7 @@
 // Configuration for backend selection
 const config = {
-  // Set to 'openai' or 'gemini' to choose the backend
-  BACKEND_TYPE: process.env.BACKEND_TYPE || 'gemini',
+  // Browser sessions always start on Gemini. OpenAI is selected per session.
+  BACKEND_TYPE: 'gemini',
   
   // OpenAI configuration
   OPENAI: {
