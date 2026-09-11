@@ -1,71 +1,59 @@
-# Backend Switching Guide
+# Session provider selection
 
-## Current production posture
+## Production behavior
 
-Gemini is the default and production backend. The frontend intentionally exposes only Gemini while the OpenAI migration is validated separately. Do not switch production traffic or re-enable `/useOpenAI` as part of backend implementation work.
+Gemini is the immutable startup provider and the default for every new browser session. The UI exposes a Gemini/OpenAI selector after session initialization. Selecting OpenAI changes only the current browser session; it does not mutate process configuration or another session.
 
-The server still supports `BACKEND_TYPE=openai` for isolated validation. Runtime switching creates a fresh provider conversation; it does not carry history between providers.
+Provider state is explicit in the browser API:
+
+- `POST /session/init` creates a Gemini session and returns `sessionId`, `provider`, `assistantId`, and `threadId`.
+- `GET /session/state` returns the current session state.
+- `POST /session/provider` accepts `sessionId` and `provider` (`gemini` or `openai`). A successful change creates a fresh provider conversation.
+- `POST /chatWithAssistant` dispatches through the provider and thread recorded for that session.
+
+The former process-global runtime switcher and `BACKEND_TYPE` override are not used. Compatibility slash commands direct visitors to the visible selector so UI and server state cannot diverge.
+
+If OpenAI initialization or conversation creation fails, the server leaves that session's provider and Gemini thread unchanged. Client responses are generic and do not include SDK errors or credentials.
 
 ## OpenAI backend
 
 The OpenAI adapter uses the Responses API and durable Conversations API:
 
-- `createThread()` creates an OpenAI conversation and returns its `conv_...` identifier as the existing `threadId` contract.
-- `chatWithAssistant()` sends the user turn to `responses.create` with the conversation identifier.
-- Persona instructions are source-controlled in `src/server/config.js` and sent on every response request.
-- Knowledge-base parity uses the Responses `file_search` tool and a pre-provisioned vector store.
-- Responses are synchronous for this flow; the SDK enforces a bounded request timeout and retries transient failures.
+- `createThread()` creates an OpenAI conversation.
+- `chatWithAssistant()` sends each turn to `responses.create` with that conversation identifier.
+- Persona instructions come from `src/server/config.js`.
+- Knowledge-base parity uses the pre-provisioned Responses `file_search` vector store.
 
-Required for isolated OpenAI validation:
+Required when a session selects OpenAI:
 
 - `OPENAI_API_KEY`
-- `OPENAI_VECTOR_STORE_ID` — must identify a populated vector store containing the three knowledge-base PDFs
+- `OPENAI_VECTOR_STORE_ID`
 
 Optional:
 
 - `OPENAI_MODEL` (default: `gpt-4o-mini`)
 - `OPENAI_REQUEST_TIMEOUT_MS` (default: `30000`)
 
-The adapter fails initialization when the vector-store ID is absent so knowledge-base behavior cannot be silently dropped. Provisioning/uploading that store is deliberately out of band: server startup does not create billable resources or duplicate files.
+The selector does not provision, upload, or modify the vector store.
 
 ## Gemini backend
 
-Gemini behavior is unchanged:
+Gemini startup and knowledge-base behavior are unchanged. The local PDFs are uploaded or loaded from the existing cache, and conversation history remains keyed by Gemini thread ID.
 
-- `BACKEND_TYPE=gemini` remains the default.
-- The local PDFs are uploaded/cached through the existing Gemini implementation.
-- Gemini retains its existing in-memory conversation history behavior.
+## Cloud Run multi-instance boundary
 
-## Knowledge base
+Browser sessions and Gemini conversation history remain process-local. Requests that reach a different Cloud Run instance fail closed with `401` rather than falling back to a process-wide provider, so they cannot cross sessions or accidentally invoke OpenAI. Reliable multi-instance continuity would require a shared session/history store or configured affinity; that infrastructure change is intentionally outside this UI re-enablement.
 
-The source documents remain in `src/server/`:
+## Local development
 
-- `xamatriain.pdf`
-- `xamatriain_guide.pdf`
-- `blog.pdf`
-
-Gemini consumes these files directly. OpenAI requires equivalent copies to be fully processed in the vector store referenced by `OPENAI_VECTOR_STORE_ID`.
-
-## Local commands
-
-Gemini (default):
+Run the frontend and server with:
 
 ```bash
-npm run dev-gemini
+npm run dev
 ```
 
-OpenAI, only after configuring an isolated key and populated vector store:
-
-```bash
-npm run dev-openai
-```
+All new sessions still start on Gemini. OpenAI initializes lazily only when that session selects it in the UI.
 
 ## Rollout boundary
 
-A later controlled rollout must separately:
-
-1. Provision or verify the OpenAI vector store and its three files.
-2. Make a non-billable configuration check, then obtain explicit authorization for a billable live response test.
-3. Compare persona/file-search behavior, errors, latency, and cost against Gemini.
-4. Re-enable the frontend selector in its own reviewed change only after parity is accepted.
-5. Change production configuration/traffic only through the normal deployment process.
+This change does not alter Cloud Run, secrets, vector-store contents, traffic, deployment configuration, or production deployment. Live provider checks remain a separate explicitly authorized step because they may be billable.

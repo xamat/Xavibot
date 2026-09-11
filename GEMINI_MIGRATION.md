@@ -64,11 +64,10 @@ The new `app-gemini.js` implements:
 # Install new dependencies
 npm install
 
-# Test Gemini backend
-npm run dev-gemini
-
-# Test original OpenAI backend
+# Start Gemini-default development server
 npm run dev
+
+# Select OpenAI for one browser session in the UI
 ```
 
 ### 6. Deployment Changes

@@ -19,13 +19,13 @@ describe('backend selection configuration', () => {
     expect(config.BACKEND_TYPE).toBe('gemini');
   });
 
-  test('respects an explicit OpenAI override', () => {
+  test('ignores process-wide provider overrides so sessions still start on Gemini', () => {
     process.env.BACKEND_TYPE = 'openai';
     jest.resetModules();
 
     const config = require('./config');
 
-    expect(config.BACKEND_TYPE).toBe('openai');
+    expect(config.BACKEND_TYPE).toBe('gemini');
   });
 
   test('uses a bounded OpenAI request timeout by default', () => {
