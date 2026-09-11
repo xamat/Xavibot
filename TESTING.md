@@ -12,8 +12,8 @@ Verify:
 4. Sending `hello` works
 5. Sending a normal question works
 6. `/useGemini` works
-7. `/useOpenAI` works
-8. Another normal question works after backend switch
+7. `/useOpenAI` reports that Gemini is the only available backend
+8. Another normal question works after the rejected switch command
 
 ## Browser network checks
 
